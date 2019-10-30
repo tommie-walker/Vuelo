@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Layout, notification } from "antd";
 import Config from "./config/app.local.config";
-import {isEmpty} from 'lodash';
+import { isEmpty } from 'lodash';
 
 import "antd/dist/antd.css";
 import "./App.css";
@@ -17,41 +17,27 @@ function App() {
   const [helicopters, setHelicopters] = useState([]);
 
   useEffect(() => {
-    if(isEmpty(helicopters)) {
+    if (isEmpty(helicopters)) {
       fetch(`${Config.helicopterServiceUrl}`)
-          .then(res => {
-            if (!res.ok) {
-              throw Error(res.statusText);
-            }
-            console.log(res);
-            return res.json();
-          })
-          .then(h => {
-            console.log(h.map(()=> h.model));
-            
-            setHelicopters(h);
-          })
-          .catch(err => {
-            console.log('here');
-            // handleError(err);
-          });
+        .then(res => {
+          if (!res.ok) {
+            throw Error(res.statusText);
+          }
+          console.log(res);
+          return res.json();
+        })
+        .then(h => {
+          setHelicopters(h);
+        })
+        .catch(err => {
+          handleError(err);
+        });
     }
-  }, [])
+  }, [helicopters])
 
-   const [users] = useState([
-      {
-        username: "Brayden",
-        password: "test",
-        email: "test"
-      }
-    ]);
-
-  // function handleError() {
-  //   notification["error"]({
-  //     message: "Oh No! Something went wrong!",
-  //     description: `Sorry about that! It will be back up and running in a jiffy!`
-  //   });
-  // }
+  function handleError() {
+    notification.open("Oh No! Something went wrong!");
+  }
 
   return (
     <Router>
@@ -76,7 +62,7 @@ function App() {
         <Route
           path="/login"
           exact
-          render={() => <Login users={users} />}
+          render={() => <Login />}
         />
         <Route path="/signUp" exact render={() => <SignUp />} />
       </Layout>

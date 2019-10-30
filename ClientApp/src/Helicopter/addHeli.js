@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Button, Form, Row, Col } from "antd";
+import { Input, Button, Form } from "antd";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
@@ -149,7 +149,7 @@ function AddHeli(props) {
           <Form.Item>
             <Input
               type="text"
-              placeholder="Source"
+              placeholder="Image Source"
               name="src"
               value={src}
               onChange={e => setSrc(e.target.value)}

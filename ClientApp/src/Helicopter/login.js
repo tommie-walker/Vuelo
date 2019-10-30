@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Form, Input, Row, Col, Card, Avatar, Button, notification } from "antd";
+import { Form, Input, Card, Avatar, Button, notification } from "antd";
 import { Link } from "react-router-dom";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
-function Login(props) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -40,7 +40,7 @@ function Login(props) {
       refreshPage();
       clearFields();
     } catch (err) {
-      notification(err);
+      notification.open(err);
     }
   }
 

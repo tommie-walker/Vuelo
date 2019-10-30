@@ -81,7 +81,7 @@ const HeliDetailPage = () => {
         <Banner />
         {auth ? (
           <>
-            <h1 className="big-title">Edit Helicopter</h1>
+            <h6 className="big-title">Edit Helicopter</h6>
             <Form
               {...formItemLayout}
               onSubmit={event => {
@@ -201,16 +201,16 @@ const HeliDetailPage = () => {
             <>
               <Row>
                 <Col span={24}>
-                  <h1 className="big-title">
+                  <h6 className="big-title">
                     {type} {heliModel}
-                  </h1>
+                  </h6>
                 </Col>
               </Row>
               <Row>
-                <Col span={{ sm: 24, md: 12, lg: 8, xl: 8 }}>
+                <Col span={8}>
                   <img src={heliUrl} className="detailImg" alt={heliModel} />
                 </Col>
-                <Col span={{ sm: 24, md: 12, lg: 8, xl: 8 }}>
+                <Col span={8}>
                   <List
                     bordered
                     styles={{
