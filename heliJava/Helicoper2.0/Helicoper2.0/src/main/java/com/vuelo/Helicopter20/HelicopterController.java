@@ -24,8 +24,8 @@ import java.util.List;
 @CrossOrigin
 @RestController
 public class HelicopterController {
-
     @Autowired
+    private
     HelicopterRepository helicopterRepository;
 
     @RequestMapping("/")
@@ -33,45 +33,29 @@ public class HelicopterController {
         return "Greetings from Spring Boot!";
     }
 
-
-
     @RequestMapping("/api/helicopter")
     public  String getAllHelicopters() throws JsonProcessingException {
         List<Helicopter> h = helicopterRepository.findAll();
-
         //Output to front end
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(h);
-
-        //Read and convert to object from frontend
-       // List<Helicopter> h2 =  objectMapper.readValue( json , objectMapper.getTypeFactory()
-             //   .constructCollectionType(List.class, Helicopter.class));
-        System.out.println(json);
-        return json;
-        // return heliRepo.findByModel(model);
+        return objectMapper.writeValueAsString(h);
     }
 
-    @PostMapping("/Helicopter/createHeli")
-    public Helicopter createHelicopter(@RequestBody Helicopter heli, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
+    @PostMapping("api/createHelicopter")
+    public Helicopter createHelicopter(@RequestBody Helicopter heli, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
         ObjectMapper objectMapper = new ObjectMapper();
         httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
         httpResponse.setHeader("Access-Control-Allow-Headers", "*");
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Max-Age", "4800");
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-
             helicopterRepository.insert(heli);
-
             return heli;
-
     }
-
 
     @RequestMapping("/Helicopter/{model}")
     public  String getHelicopterByModel(@PathVariable String model){
         Helicopter h = helicopterRepository.findByModel(model);
         return h.toString();
     }
-
-
 }
