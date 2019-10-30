@@ -23,6 +23,5 @@ public class Helicopter {
     double height;
     double rotorDiameter;
     int maxSpeed;
-    String manufacturer;
     String url;
 }
