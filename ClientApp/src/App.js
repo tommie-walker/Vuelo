@@ -33,15 +33,7 @@ function App() {
           handleError(err);
         });
     }
-  }, [])
-
-  const [users] = useState([
-    {
-      username: "Brayden",
-      password: "test",
-      email: "test"
-    }
-  ]);
+  }, [helicopters])
 
   function handleError() {
     notification.open("Oh No! Something went wrong!");
@@ -70,7 +62,7 @@ function App() {
         <Route
           path="/login"
           exact
-          render={() => <Login users={users} />}
+          render={() => <Login />}
         />
         <Route path="/signUp" exact render={() => <SignUp />} />
       </Layout>
