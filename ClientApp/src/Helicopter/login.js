@@ -40,7 +40,7 @@ function Login(props) {
       refreshPage();
       clearFields();
     } catch (err) {
-      notification(err);
+      notification.open(err);
     }
   }
 

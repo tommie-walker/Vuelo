@@ -149,7 +149,7 @@ function AddHeli(props) {
           <Form.Item>
             <Input
               type="text"
-              placeholder="Source"
+              placeholder="Image Source"
               name="src"
               value={src}
               onChange={e => setSrc(e.target.value)}

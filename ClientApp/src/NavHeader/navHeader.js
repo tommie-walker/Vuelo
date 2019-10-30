@@ -18,7 +18,7 @@ const NavHeader = (props) => {
   return (
     <>
       <Icon type="right-square" theme="twoTone" onClick={toggleMenu} className='menuIcon' />
-      <div className='navHeader'>
+      <div id='navHeader'>
         <Drawer
           placement='top'
           onClose={() => setMenuOpen(false)}

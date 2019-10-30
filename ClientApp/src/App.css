@@ -91,9 +91,25 @@
   color: white;
 }
 
-.ant-drawer-content, .ant-drawer-body .navHeader {
+#ant-drawer-content-wrapper {
+  height: fit-content;
+}
+
+.ant-drawer .ant-drawer-content .ant-drawer-body #navHeader {
+  height: 50%;
+}
+
+.ant-drawer .ant-drawer-content .ant-drawer-body {
   background-color: midnightblue;
   color: white;
+}
+
+
+.ant-drawer .ant-drawer-content, .ant-drawer-content-wrapper {
+  height: fit-content;
+}
+
+#navHeader {
   height: 50%;
 }
 
