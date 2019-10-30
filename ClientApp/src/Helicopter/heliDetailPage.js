@@ -11,13 +11,12 @@ const HeliDetailPage = () => {
   const [heliUrl] = useState(heli.url);
   const [heliModel, setHeliModel] = useState(heli.model);
   const [type, setType] = useState(heli.type);
-  const [capWeight, setCapWeight] = useState(heli.capWeight);
+  const [capWeight, setCapWeight] = useState(heli.capacityWeight);
   const [crewMax, setCrewMax] = useState(heli.crewMax);
   const [crewMin, setCrewMin] = useState(heli.crewMin);
-  const [fuseLength, setFuseLength] = useState(heli.fuseLength);
-  const [heliHeight, setHeliHeight] = useState(heli.heliHeight);
-  const [rotorDiam, setRotorDiam] = useState(heli.rotorDiam);
-  const [engineType, setEngineType] = useState(heli.engineType);
+  const [fuseLength, setFuseLength] = useState(heli.fuselageLength);
+  const [heliHeight, setHeliHeight] = useState(heli.height);
+  const [rotorDiam, setRotorDiam] = useState(heli.rotorDiameter);
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
   const [auth] = useState(localStorage.getItem("token") || "");
 
@@ -51,7 +50,7 @@ const HeliDetailPage = () => {
 
   function updateHelicopter() {
 
-    const heli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, engineType, maxSpeed };
+    const heli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, maxSpeed };
 
 
     fetch(`${Config.helicopterServiceUrl}`, {
@@ -161,15 +160,6 @@ const HeliDetailPage = () => {
                   onChange={e => setRotorDiam(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Engine Type">
-                <Input
-                  type="text"
-                  placeholder="Engine Type"
-                  name="engineType"
-                  value={engineType}
-                  onChange={e => setEngineType(e.target.value)}
-                />
-              </Form.Item>
               <Form.Item label="Max Speed">
                 <Input
                   type="text"
@@ -249,9 +239,6 @@ const HeliDetailPage = () => {
                     </List.Item>
                     <List.Item>
                       <p>{`Rotor Diameter: ${rotorDiam}`}</p>
-                    </List.Item>
-                    <List.Item>
-                      <p>{`Engine Type: ${engineType}`}</p>
                     </List.Item>
                     <List.Item>
                       <p>{`Max Speed: ${maxSpeed}`}</p>
