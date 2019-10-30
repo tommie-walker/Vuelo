@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Drawer, Button, Divider, Slider, Radio } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
@@ -17,6 +17,10 @@ function Helicopter(props) {
   const [heliHeight, setHeliHeight] = useState(5);
   const [rotorDiam, setRotorDiam] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
+
+  useEffect(() => {
+    console.log(filtHeli);
+  }, [filtHeli]);
 
   const radioStyle = {
     display: "block",
@@ -41,10 +45,9 @@ function Helicopter(props) {
   ));
 
   function handleSearch(value) {
-    const escapedString = escapeStringRegexp(value);
-    const searchResults = props.helicopters.filter(
-      h => h.model.search(escapedString) === 0
-    );
+    const capital = value.toUpperCase()
+    const escapedString = escapeStringRegexp(capital);
+    const searchResults = props.helicopters.filter(h => h.model.search(escapedString) === 0);
     const filteredResults =
       typeSelected === "All"
         ? searchResults
