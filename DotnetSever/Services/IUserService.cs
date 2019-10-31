@@ -12,6 +12,7 @@ namespace RSIVueloAPI.Services
         void Remove(User userIn);
         void Remove(string id);
         User LoginUser(string username, string password);
+        User ForgotPassword(string emailAddress);
 
     }
 }

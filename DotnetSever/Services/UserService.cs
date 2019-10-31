@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Http.Filters;
 using System.Web.Http.Controllers;
 using System.Net.Http;
+using System.Net.Mail;
+using System.Net;
 
 namespace RSIVueloAPI.Services
 {
@@ -95,6 +97,40 @@ namespace RSIVueloAPI.Services
                 return user;
             else // user not found or wrong password
                 return null;
+        }
+
+        public User ForgotPassword(string emailAddress)
+        {
+            if (string.IsNullOrEmpty(emailAddress))
+                return null;
+
+            // null if user is not in database
+            User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
+
+            if (user == null)
+                return null;
+
+            SmtpClient client = new SmtpClient("smtp.gmail.com");
+            client.Port = 587;
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential("jo3jo3jo31234@gmail.com", "joeJOEjoe$0$");
+
+            // jo3JO3jo31234@gmail.com
+            // joeJOEjoe$0$
+            
+
+            MailMessage msg = new MailMessage();
+            msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
+            msg.To.Add(emailAddress);
+            msg.Subject = "Email Verification";
+            var redirect = "https://localhost:5001/login";
+            msg.Body = string.Format("Please click the <a href=\'{0}'> link </a> to verify password", redirect);
+            msg.IsBodyHtml = true;
+
+            client.Send(msg);
+
+            return user; 
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

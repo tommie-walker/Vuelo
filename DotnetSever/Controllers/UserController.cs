@@ -90,5 +90,15 @@ namespace RSIVueloAPI.Controllers
             _userService.Remove(user.Id);
             return Ok(user);
         }
+
+        [HttpPost("[action]")]
+        public IActionResult ChangePassword(string emailAddress)
+        {
+            var user = _userService.ForgotPassword(emailAddress);
+            if (user == null)
+                return StatusCode(StatusCodes.Status404NotFound);
+
+            return Ok(emailAddress);
+        }
     }
 }
