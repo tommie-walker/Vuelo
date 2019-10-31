@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 const { Meta } = Card;
 
 const HelicopterCard = (props) => {
-  console.log(props.helicopter.url);
   return (
     <>
       <Link to={{

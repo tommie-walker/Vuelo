@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Drawer, Button, Divider, Slider, Radio } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
@@ -7,16 +7,21 @@ import HelicopterList from "./helicopter-list";
 
 function Helicopter(props) {
   const { Search } = Input;
-  const [filtHeli, setFiltHeli] = useState([]);
+  const helicopters = props.helicopters
+  const [filtHeli, setFiltHeli] = useState(helicopters);
   const [typeSelected, setTypeSelected] = useState("All");
   const [visible, setVisible] = useState(false);
-  const [capWeight, setCapWeight] = useState(10000);
+  const [capacityWeight, setCapacityWeight] = useState(10000);
   const [crewMax, setCrewMax] = useState(15);
   const [crewMin, setCrewMin] = useState(1);
-  const [fuseLength, setFuseLength] = useState(50);
+  const [fuselageLength, setFuselageLength] = useState(50);
   const [heliHeight, setHeliHeight] = useState(5);
-  const [rotorDiam, setRotorDiam] = useState(10);
+  const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
+
+  useEffect(() => {
+    console.log(filtHeli)
+  }, [filtHeli]);
 
   const radioStyle = {
     display: "block",
@@ -24,7 +29,7 @@ function Helicopter(props) {
     lineHeight: "30px"
   };
 
-  const allTypes = props.helicopters.map(h => h.type);
+  const allTypes = helicopters.map(h => h.type);
   const uniqueTypes = allTypes.filter(
     (r, index) => allTypes.indexOf(r) === index
   );
@@ -41,50 +46,49 @@ function Helicopter(props) {
   ));
 
   function handleSearch(value) {
-    const escapedString = escapeStringRegexp(value);
-    const searchResults = props.helicopters.filter(
-      h => h.model.search(escapedString) === 0
-    );
+    const upperCaseSearchValue = value.toUpperCase()
+    const escapedString = escapeStringRegexp(upperCaseSearchValue);
+    const searchResults = helicopters.filter(h => h.model.search(escapedString) === 0);
     const filteredResults =
       typeSelected === "All"
         ? searchResults
         : searchResults.filter(
           r =>
             r.type === typeSelected &&
-            r.capWeight >= capWeight &&
+            r.capacityWeight >= capacityWeight &&
             r.crewMax <= crewMax &&
             r.crewMin >= crewMin &&
-            r.fuseLength >= fuseLength &&
-            r.heliHeight >= heliHeight &&
-            r.rotorDiam >= rotorDiam &&
+            r.fuselageLength >= fuselageLength &&
+            r.height >= heliHeight &&
+            r.rotorDiameter >= rotorDiam &&
             r.maxSpeed >= maxSpeed
         );
     setFiltHeli(filteredResults);
   }
 
   function handleSelected(type) {
-    const helisOfOneType = props.helicopters.filter(h => h.type === type);
+    const helisOfOneType = helicopters.filter(h => h.type === type);
     setTypeSelected(type);
     setFiltHeli(helisOfOneType);
   }
 
   function handleSlider() {
-    const sliderResults = props.helicopters.filter(h =>
+    const sliderResults = helicopters.filter(h =>
       typeSelected === "All"
-        ? parseInt(h.capWeight) >= capWeight &&
+        ? parseInt(h.capacityWeight) >= capacityWeight &&
         parseInt(h.crewMax) <= crewMax &&
         parseInt(h.crewMin) >= crewMin &&
-        parseInt(h.fuseLength) >= fuseLength &&
-        parseInt(h.heliHeight) >= heliHeight &&
-        parseInt(h.rotorDiam) >= rotorDiam &&
+        parseInt(h.fuselageLength) >= fuselageLength &&
+        parseInt(h.height) >= heliHeight &&
+        parseInt(h.rotorDiameter) >= rotorDiam &&
         parseInt(h.maxSpeed) >= maxSpeed
         : h.type === typeSelected &&
-        parseInt(h.capWeight) >= capWeight &&
+        parseInt(h.capacityWeight) >= capacityWeight &&
         parseInt(h.crewMax) <= crewMax &&
         parseInt(h.crewMin) >= crewMin &&
-        parseInt(h.fuseLength) >= fuseLength &&
-        parseInt(h.heliHeight) >= heliHeight &&
-        parseInt(h.rotorDiam) >= rotorDiam &&
+        parseInt(h.fuselageLength) >= fuselageLength &&
+        parseInt(h.height) >= heliHeight &&
+        parseInt(h.rotorDiameter) >= rotorDiam &&
         parseInt(h.maxSpeed) >= maxSpeed
     );
     setFiltHeli(sliderResults);
@@ -138,13 +142,13 @@ function Helicopter(props) {
         <Divider />
         <span>
           <h3 className='drawerContentTitle'>Minimum Capacity Weight</h3>
-          <p>{`${capWeight} pounds`}</p>
+          <p>{`${capacityWeight} pounds`}</p>
         </span>
         <Slider
-          defaultValue={capWeight}
+          defaultValue={capacityWeight}
           min={10000}
           max={50000}
-          onChange={setCapWeight}
+          onChange={setCapacityWeight}
           onAfterChange={handleSlider}
         />
         <Divider />
@@ -174,13 +178,13 @@ function Helicopter(props) {
         <Divider />
         <span>
           <h3 className='drawerContentTitle'>Minimum Fuselage Length</h3>
-          <p>{`${fuseLength} meters`}</p>
+          <p>{`${fuselageLength} meters`}</p>
         </span>
         <Slider
-          defaultValue={fuseLength}
+          defaultValue={fuselageLength}
           min={50}
           max={200}
-          onChange={setFuseLength}
+          onChange={setFuselageLength}
           onAfterChange={handleSlider}
         />
         <Divider />
@@ -204,7 +208,7 @@ function Helicopter(props) {
           defaultValue={rotorDiam}
           min={10}
           max={100}
-          onChange={setRotorDiam}
+          onChange={setRotorDiameter}
           onAfterChange={handleSlider}
         />
         <Divider />
@@ -223,7 +227,7 @@ function Helicopter(props) {
         />
       </Drawer>
       <HelicopterList
-        filtHeli={isEmpty(filtHeli) ? props.helicopters : filtHeli}
+        filtHeli={isEmpty(filtHeli) ? helicopters : filtHeli}
       />
     </div>
   );

@@ -9,15 +9,14 @@ const HeliDetailPage = () => {
   let location = useLocation();
   const heli = location.state.helicopter;
   const [heliUrl] = useState(heli.url);
-  const [heliModel, setHeliModel] = useState(heli.model);
+  const [model, setmodel] = useState(heli.model);
   const [type, setType] = useState(heli.type);
-  const [capWeight, setCapWeight] = useState(heli.capWeight);
+  const [capacityWeight, setCapacityWeight] = useState(heli.capacityWeight);
   const [crewMax, setCrewMax] = useState(heli.crewMax);
   const [crewMin, setCrewMin] = useState(heli.crewMin);
-  const [fuseLength, setFuseLength] = useState(heli.fuseLength);
-  const [heliHeight, setHeliHeight] = useState(heli.heliHeight);
-  const [rotorDiam, setRotorDiam] = useState(heli.rotorDiam);
-  const [engineType, setEngineType] = useState(heli.engineType);
+  const [fuselageLength, setFuselageLength] = useState(heli.fuselageLength);
+  const [heliHeight, setHeliHeight] = useState(heli.height);
+  const [rotorDiam, setRotorDiameter] = useState(heli.rotorDiameter);
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
   const [auth] = useState(localStorage.getItem("token") || "");
 
@@ -51,7 +50,7 @@ const HeliDetailPage = () => {
 
   function updateHelicopter() {
 
-    const heli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, engineType, maxSpeed };
+    const heli = { type, model, capacityWeight, crewMax, crewMin, fuselageLength, heliHeight, rotorDiam, maxSpeed };
 
 
     fetch(`${Config.helicopterServiceUrl}`, {
@@ -102,18 +101,18 @@ const HeliDetailPage = () => {
                 <Input
                   type="text"
                   placeholder="Model"
-                  name="heliModel"
-                  value={heliModel}
-                  onChange={e => setHeliModel(e.target.value)}
+                  name="model"
+                  value={model}
+                  onChange={e => setmodel(e.target.value)}
                 />
               </Form.Item>
               <Form.Item label="Capacity Weight">
                 <Input
                   type="text"
                   placeholder="Capacity Weight"
-                  name="capWeight"
-                  value={capWeight}
-                  onChange={e => setCapWeight(e.target.value)}
+                  name="capacityWeight"
+                  value={capacityWeight}
+                  onChange={e => setCapacityWeight(e.target.value)}
                 />
               </Form.Item>
               <Form.Item label="Crew Maximum">
@@ -138,9 +137,9 @@ const HeliDetailPage = () => {
                 <Input
                   type="text"
                   placeholder="Fuselage Length"
-                  name="fuseLength"
-                  value={fuseLength}
-                  onChange={e => setFuseLength(e.target.value)}
+                  name="fuselageLength"
+                  value={fuselageLength}
+                  onChange={e => setFuselageLength(e.target.value)}
                 />
               </Form.Item>
               <Form.Item label="Helicopter Height">
@@ -158,16 +157,7 @@ const HeliDetailPage = () => {
                   placeholder="Rotor Diameter"
                   name="rotorDiam"
                   value={rotorDiam}
-                  onChange={e => setRotorDiam(e.target.value)}
-                />
-              </Form.Item>
-              <Form.Item label="Engine Type">
-                <Input
-                  type="text"
-                  placeholder="Engine Type"
-                  name="engineType"
-                  value={engineType}
-                  onChange={e => setEngineType(e.target.value)}
+                  onChange={e => setRotorDiameter(e.target.value)}
                 />
               </Form.Item>
               <Form.Item label="Max Speed">
@@ -202,13 +192,13 @@ const HeliDetailPage = () => {
               <Row>
                 <Col span={24}>
                   <h6 className="big-title">
-                    {type} {heliModel}
+                    {type} {model}
                   </h6>
                 </Col>
               </Row>
               <Row>
                 <Col span={8}>
-                  <img src={heliUrl} className="detailImg" alt={heliModel} />
+                  <img src={heliUrl} className="detailImg" alt={model} />
                 </Col>
                 <Col span={8}>
                   <List
@@ -230,10 +220,10 @@ const HeliDetailPage = () => {
                       <p>{`Type: ${type}`}</p>
                     </List.Item>
                     <List.Item>
-                      <p>{`Model: ${heliModel}`}</p>
+                      <p>{`Model: ${model}`}</p>
                     </List.Item>
                     <List.Item>
-                      <p>{`Capacity Weight: ${capWeight}`}</p>
+                      <p>{`Capacity Weight: ${capacityWeight}`}</p>
                     </List.Item>
                     <List.Item>
                       <p>{`Crew Maximum: ${crewMax}`}</p>
@@ -242,16 +232,13 @@ const HeliDetailPage = () => {
                       <p>{`Crew Minimum: ${crewMin}`}</p>
                     </List.Item>
                     <List.Item>
-                      <p>{`Fuselage Length: ${fuseLength}`}</p>
+                      <p>{`Fuselage Length: ${fuselageLength}`}</p>
                     </List.Item>
                     <List.Item>
                       <p>{`Helicopter Height: ${heliHeight}`}</p>
                     </List.Item>
                     <List.Item>
                       <p>{`Rotor Diameter: ${rotorDiam}`}</p>
-                    </List.Item>
-                    <List.Item>
-                      <p>{`Engine Type: ${engineType}`}</p>
                     </List.Item>
                     <List.Item>
                       <p>{`Max Speed: ${maxSpeed}`}</p>
