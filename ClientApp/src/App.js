@@ -10,8 +10,8 @@ import "./App.css";
 import Helicopter from "./Helicopter/Helicopter";
 import AddHeli from "./Helicopter/addHeli";
 import HeliDetailPage from "./Helicopter/heliDetailPage";
-import Login from "./Helicopter/login";
-import SignUp from "./Helicopter/signUp";
+import Login from "./User/login";
+import SignUp from "./User/signUp";
 
 function App() {
   const [helicopters, setHelicopters] = useState([]);
