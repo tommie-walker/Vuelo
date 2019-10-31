@@ -12,7 +12,7 @@ function AddHeli(props) {
   const [fuseLength, setFuseLength] = useState();
   const [heliHeight, setHeliHeight] = useState();
   const [rotorDiam, setRotorDiam] = useState();
-  const [src, setSrc] = useState();
+  const [url, setUrl] = useState();
   const [maxSpeed, setMaxSpeed] = useState();
 
 
@@ -25,13 +25,13 @@ function AddHeli(props) {
     setFuseLength("");
     setHeliHeight("");
     setRotorDiam("");
-    setSrc("");
+    setUrl("");
     setMaxSpeed("");
   }
 
   function addNewHelicopter() {
 
-    const newHeli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, src, maxSpeed };
+    const newHeli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, url, maxSpeed };
 
 
     fetch(`${Config.HelicopterServiceUrl}createHelicopter`, {
@@ -149,10 +149,10 @@ function AddHeli(props) {
           <Form.Item>
             <Input
               type="text"
-              placeholder="Image Source"
-              name="src"
-              value={src}
-              onChange={e => setSrc(e.target.value)}
+              placeholder="Image URL"
+              name="url"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" className="addHeliButton">

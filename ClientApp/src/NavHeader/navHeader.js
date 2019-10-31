@@ -7,7 +7,6 @@ const NavHeader = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function toggleMenu() {
-    console.log('here');
     if (menuOpen) {
       setMenuOpen(false);
     } else {

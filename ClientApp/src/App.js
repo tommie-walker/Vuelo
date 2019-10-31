@@ -23,7 +23,6 @@ function App() {
           if (!res.ok) {
             throw Error(res.statusText);
           }
-          console.log(res);
           return res.json();
         })
         .then(h => {
