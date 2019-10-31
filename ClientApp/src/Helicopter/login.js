@@ -34,8 +34,9 @@ function Login() {
     try {
       const userData = await response.json();
       if (!response.ok) throw new Error(response.status);
-      localStorage.setItem("token", userData.token);
       localStorage.setItem("username", userData.username);
+      localStorage.setItem("favorites", userData.favorites);
+      localStorage.setItem("token", userData.token);
       refreshPage();
       clearFields();
     } catch (err) {

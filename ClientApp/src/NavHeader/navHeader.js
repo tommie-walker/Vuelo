@@ -41,8 +41,9 @@ const NavHeader = (props) => {
               <>
                 <Col span={3} offset={10}>
                   <Link to='/' onClick={() => {
-                    localStorage.removeItem('token');
                     localStorage.removeItem('username');
+                    localStorage.removeItem('favorites');
+                    localStorage.removeItem('token');
                     document.location.reload();
                   }}>
                     <h1 className='drawerContentTitle'><Icon type="profile" />Logout</h1>
