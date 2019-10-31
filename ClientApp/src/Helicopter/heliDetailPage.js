@@ -20,17 +20,6 @@ const HeliDetailPage = () => {
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
   const [auth] = useState(localStorage.getItem("token") || "");
 
-  const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 6 }
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 16 }
-    }
-  };
-
   function deleteHeli() {
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
       method: `DELETE`
@@ -82,13 +71,12 @@ const HeliDetailPage = () => {
           <>
             <h6 className="big-title">Edit Helicopter</h6>
             <Form
-              {...formItemLayout}
               onSubmit={event => {
                 event.preventDefault();
                 updateHelicopter();
               }}
             >
-              <Form.Item label="Type">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Type"
@@ -97,7 +85,7 @@ const HeliDetailPage = () => {
                   onChange={e => setType(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Model">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Model"
@@ -106,7 +94,7 @@ const HeliDetailPage = () => {
                   onChange={e => setmodel(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Capacity Weight">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Capacity Weight"
@@ -115,7 +103,7 @@ const HeliDetailPage = () => {
                   onChange={e => setCapacityWeight(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Crew Maximum">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Crew Maximum"
@@ -124,7 +112,7 @@ const HeliDetailPage = () => {
                   onChange={e => setCrewMax(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Crew Minimum">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Crew Minimum"
@@ -133,7 +121,7 @@ const HeliDetailPage = () => {
                   onChange={e => setCrewMin(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Fuselage Length">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Fuselage Length"
@@ -142,7 +130,7 @@ const HeliDetailPage = () => {
                   onChange={e => setFuselageLength(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Helicopter Height">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Helicopter Height"
@@ -151,7 +139,7 @@ const HeliDetailPage = () => {
                   onChange={e => setHeliHeight(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Rotor Diameter">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Rotor Diameter"
@@ -160,7 +148,7 @@ const HeliDetailPage = () => {
                   onChange={e => setRotorDiameter(e.target.value)}
                 />
               </Form.Item>
-              <Form.Item label="Max Speed">
+              <Form.Item>
                 <Input
                   type="text"
                   placeholder="Max Speed"
