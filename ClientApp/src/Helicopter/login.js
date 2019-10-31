@@ -26,8 +26,7 @@ function Login() {
       method: "POST",
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': '123'
+        'Accept': 'application/json'
       },
       accepts: 'application/json',
       body: JSON.stringify(user)
