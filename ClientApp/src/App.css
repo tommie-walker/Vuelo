@@ -17,6 +17,15 @@
   height: fit-content;
 }
 
+.detailContent {
+  font-size: calc(30px + 3vw);
+  height: 100vh;
+}
+
+.detailListItem {
+  font-size: 3vh;
+}
+
 .ant-input {
   height: 2.5em;
 }

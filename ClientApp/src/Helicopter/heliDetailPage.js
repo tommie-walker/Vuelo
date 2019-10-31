@@ -7,7 +7,9 @@ import Banner from '../NavHeader/banner';
 
 const HeliDetailPage = () => {
   let location = useLocation();
+  console.log(location.state)
   const heli = location.state.helicopter;
+
   const [heliUrl] = useState(heli.url);
   const [model, setmodel] = useState(heli.model);
   const [type, setType] = useState(heli.type);
@@ -65,7 +67,7 @@ const HeliDetailPage = () => {
 
   return (
     <>
-      <div className='mainContent'>
+      <div className='detailContent'>
         <Banner />
         {auth ? (
           <>
@@ -185,15 +187,12 @@ const HeliDetailPage = () => {
                 </Col>
               </Row>
               <Row>
-                <Col span={8}>
+                <Col span={12}>
                   <img src={heliUrl} className="detailImg" alt={model} />
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                   <List
                     bordered
-                    styles={{
-                      fontSize: "50px"
-                    }}
                     itemLayout="horizontal"
                     grid={{
                       gutter: 40,
@@ -204,31 +203,31 @@ const HeliDetailPage = () => {
                       xl: 4
                     }}
                   >
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Type: ${type}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Model: ${model}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Capacity Weight: ${capacityWeight}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Crew Maximum: ${crewMax}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Crew Minimum: ${crewMin}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Fuselage Length: ${fuselageLength}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Helicopter Height: ${heliHeight}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Rotor Diameter: ${rotorDiam}`}</p>
                     </List.Item>
-                    <List.Item>
+                    <List.Item className='detailListItem'>
                       <p>{`Max Speed: ${maxSpeed}`}</p>
                     </List.Item>
                   </List>
