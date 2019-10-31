@@ -116,14 +116,10 @@ namespace RSIVueloAPI.Services
             client.UseDefaultCredentials = false;
             client.Credentials = new NetworkCredential("jo3jo3jo31234@gmail.com", "joeJOEjoe$0$");
 
-            // jo3JO3jo31234@gmail.com
-            // joeJOEjoe$0$
-            
-
             MailMessage msg = new MailMessage();
             msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
             msg.To.Add(emailAddress);
-            msg.Subject = "Email Verification";
+            msg.Subject = "Vuelo Email Verification";
             var redirect = "https://localhost:5001/login";
             msg.Body = string.Format("Please click the <a href=\'{0}'> link </a> to verify password", redirect);
             msg.IsBodyHtml = true;
@@ -131,6 +127,25 @@ namespace RSIVueloAPI.Services
             client.Send(msg);
 
             return user; 
+        }
+
+        public User ChangePassword(string password, UserDTO userIn)
+        {
+            User user = new User(userIn);
+
+            if (string.IsNullOrEmpty(password))
+                return null;
+
+            // new password not empty, so generate new password w/ hash and salt
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            _users.ReplaceOne(temp => temp.Id == user.Id, user);
+
+            return user;
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
