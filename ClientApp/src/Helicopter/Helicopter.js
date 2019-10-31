@@ -11,11 +11,11 @@ function Helicopter(props) {
   const [filtHeli, setFiltHeli] = useState(helicopters);
   const [typeSelected, setTypeSelected] = useState("All");
   const [visible, setVisible] = useState(false);
-  const [capacityWeight, setCapacityWeight] = useState(10000);
-  const [crewMax, setCrewMax] = useState(15);
+  const [capacityWeight, setCapacityWeight] = useState(1000);
+  const [crewMax, setCrewMax] = useState(1);
   const [crewMin, setCrewMin] = useState(1);
-  const [fuselageLength, setFuselageLength] = useState(50);
-  const [heliHeight, setHeliHeight] = useState(5);
+  const [fuselageLength, setFuselageLength] = useState(1);
+  const [heliHeight, setHeliHeight] = useState(1);
   const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
 
@@ -56,7 +56,7 @@ function Helicopter(props) {
           r =>
             r.type === typeSelected &&
             r.capacityWeight >= capacityWeight &&
-            r.crewMax <= crewMax &&
+            r.crewMax >= crewMax &&
             r.crewMin >= crewMin &&
             r.fuselageLength >= fuselageLength &&
             r.height >= heliHeight &&
@@ -76,7 +76,7 @@ function Helicopter(props) {
     const sliderResults = helicopters.filter(h =>
       typeSelected === "All"
         ? parseInt(h.capacityWeight) >= capacityWeight &&
-        parseInt(h.crewMax) <= crewMax &&
+        parseInt(h.crewMax) >= crewMax &&
         parseInt(h.crewMin) >= crewMin &&
         parseInt(h.fuselageLength) >= fuselageLength &&
         parseInt(h.height) >= heliHeight &&
@@ -146,7 +146,7 @@ function Helicopter(props) {
         </span>
         <Slider
           defaultValue={capacityWeight}
-          min={10000}
+          min={1000}
           max={50000}
           onChange={setCapacityWeight}
           onAfterChange={handleSlider}
@@ -159,7 +159,7 @@ function Helicopter(props) {
         <Slider
           defaultValue={crewMax}
           min={1}
-          max={15}
+          max={10}
           onChange={setCrewMax}
           onAfterChange={handleSlider}
         />
@@ -182,8 +182,8 @@ function Helicopter(props) {
         </span>
         <Slider
           defaultValue={fuselageLength}
-          min={50}
-          max={200}
+          min={1}
+          max={100}
           onChange={setFuselageLength}
           onAfterChange={handleSlider}
         />
@@ -194,8 +194,8 @@ function Helicopter(props) {
         </span>
         <Slider
           defaultValue={heliHeight}
-          min={5}
-          max={40}
+          min={1}
+          max={30}
           onChange={setHeliHeight}
           onAfterChange={handleSlider}
         />

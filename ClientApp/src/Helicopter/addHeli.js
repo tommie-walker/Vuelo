@@ -4,7 +4,7 @@ import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
 function AddHeli(props) {
-  const [heliModel, setHeliModel] = useState();
+  const [model, setModel] = useState();
   const [type, setType] = useState();
   const [capWeight, setCapWeight] = useState();
   const [crewMax, setCrewMax] = useState();
@@ -17,7 +17,7 @@ function AddHeli(props) {
 
 
   function clearFields() {
-    setHeliModel("");
+    setModel("");
     setType("");
     setCapWeight("");
     setCrewMax("");
@@ -31,7 +31,7 @@ function AddHeli(props) {
 
   function addNewHelicopter() {
 
-    const newHeli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, url, maxSpeed };
+    const newHeli = { type, model, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, url, maxSpeed };
 
 
     fetch(`${Config.HelicopterServiceUrl}createHelicopter`, {
@@ -79,8 +79,8 @@ function AddHeli(props) {
               type="text"
               placeholder="Model"
               name="heliModel"
-              value={heliModel}
-              onChange={e => setHeliModel(e.target.value)}
+              value={model}
+              onChange={e => setModel(e.target.value)}
             />
           </Form.Item>
           <Form.Item>
