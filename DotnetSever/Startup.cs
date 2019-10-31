@@ -36,44 +36,6 @@ namespace RSIVueloAPI
     {
       services.AddCors();
 
-      // configure strongly typed settings objects
-      var appSettingsSection = Configuration.GetSection("AppSettings");
-      services.Configure<AppSettings>(appSettingsSection);
-
-      // configure jwt authentication
-      var appSettings = appSettingsSection.Get<AppSettings>();
-      var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-      services.AddAuthentication(x =>
-      {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-      })
-      .AddJwtBearer(x =>
-      {
-        x.Events = new JwtBearerEvents
-        {
-          OnTokenValidated = context =>
-                {
-                var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                var userId = context.Principal.Identity.Name; // should be string
-                      var user = userService.Get(userId);
-                if (user == null)
-                  context.Fail("Unauthorized"); // return unauthorized if user no longer exists
-
-                      return Task.CompletedTask;
-              }
-        };
-        x.RequireHttpsMetadata = false;
-        x.SaveToken = true;
-        x.TokenValidationParameters = new TokenValidationParameters
-        {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(key),
-          ValidateIssuer = false,
-          ValidateAudience = false
-        };
-      });
-
       // requires using Microsoft.Extensions.Options
       services.Configure<UserDatabaseSettings>(
           Configuration.GetSection(nameof(UserDatabaseSettings)));
@@ -87,19 +49,6 @@ namespace RSIVueloAPI
           sp.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
 
       services.AddSingleton<UserService>();
-
-      // add csrf tokens globally
-      //services.AddMvc(options =>
-      //    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
-
-      // changing options on csrf tokens (default = checks form field)
-      // validation check to see if 'X-CSRF-TOKEN' is in the header
-      services.AddAntiforgery(options =>
-      {
-        options.Cookie.Name = "AntiforgeryToken";
-        options.HeaderName = "X-CSRF-TOKEN";
-        options.SuppressXFrameOptionsHeader = false;
-      });
 
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
       services.AddSingleton<IConfiguration>(Configuration);
@@ -131,8 +80,6 @@ namespace RSIVueloAPI
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "User API v1");
       }); // URL: /swagger
 
-      app.UseCookiePolicy();
-      app.UseAuthentication();
       app.UseHttpsRedirection();
       app.UseStaticFiles();
       app.UseSpaStaticFiles();
