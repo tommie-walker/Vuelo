@@ -51,7 +51,7 @@ public class HelicopterController {
         // return heliRepo.findByModel(model);
     }
 
-    @PostMapping("/Helicopter/createHeli")
+    @PostMapping("/api/helicopter/")
     public Helicopter createHelicopter(@RequestBody Helicopter heli, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");

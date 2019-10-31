@@ -11,12 +11,12 @@ function Helicopter(props) {
   const [filtHeli, setFiltHeli] = useState(helicopters);
   const [typeSelected, setTypeSelected] = useState("All");
   const [visible, setVisible] = useState(false);
-  const [capWeight, setCapWeight] = useState(10000);
+  const [capacityWeight, setCapacityWeight] = useState(10000);
   const [crewMax, setCrewMax] = useState(15);
   const [crewMin, setCrewMin] = useState(1);
-  const [fuseLength, setFuseLength] = useState(50);
+  const [fuselageLength, setFuselageLength] = useState(50);
   const [heliHeight, setHeliHeight] = useState(5);
-  const [rotorDiam, setRotorDiam] = useState(10);
+  const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
 
   useEffect(() => {
@@ -55,10 +55,10 @@ function Helicopter(props) {
         : searchResults.filter(
           r =>
             r.type === typeSelected &&
-            r.capacityWeight >= capWeight &&
+            r.capacityWeight >= capacityWeight &&
             r.crewMax <= crewMax &&
             r.crewMin >= crewMin &&
-            r.fuselageLength >= fuseLength &&
+            r.fuselageLength >= fuselageLength &&
             r.height >= heliHeight &&
             r.rotorDiameter >= rotorDiam &&
             r.maxSpeed >= maxSpeed
@@ -75,18 +75,18 @@ function Helicopter(props) {
   function handleSlider() {
     const sliderResults = helicopters.filter(h =>
       typeSelected === "All"
-        ? parseInt(h.capacityWeight) >= capWeight &&
+        ? parseInt(h.capacityWeight) >= capacityWeight &&
         parseInt(h.crewMax) <= crewMax &&
         parseInt(h.crewMin) >= crewMin &&
-        parseInt(h.fuselageLength) >= fuseLength &&
+        parseInt(h.fuselageLength) >= fuselageLength &&
         parseInt(h.height) >= heliHeight &&
         parseInt(h.rotorDiameter) >= rotorDiam &&
         parseInt(h.maxSpeed) >= maxSpeed
         : h.type === typeSelected &&
-        parseInt(h.capacityWeight) >= capWeight &&
+        parseInt(h.capacityWeight) >= capacityWeight &&
         parseInt(h.crewMax) <= crewMax &&
         parseInt(h.crewMin) >= crewMin &&
-        parseInt(h.fuselageLength) >= fuseLength &&
+        parseInt(h.fuselageLength) >= fuselageLength &&
         parseInt(h.height) >= heliHeight &&
         parseInt(h.rotorDiameter) >= rotorDiam &&
         parseInt(h.maxSpeed) >= maxSpeed
@@ -142,13 +142,13 @@ function Helicopter(props) {
         <Divider />
         <span>
           <h3 className='drawerContentTitle'>Minimum Capacity Weight</h3>
-          <p>{`${capWeight} pounds`}</p>
+          <p>{`${capacityWeight} pounds`}</p>
         </span>
         <Slider
-          defaultValue={capWeight}
+          defaultValue={capacityWeight}
           min={10000}
           max={50000}
-          onChange={setCapWeight}
+          onChange={setCapacityWeight}
           onAfterChange={handleSlider}
         />
         <Divider />
@@ -178,13 +178,13 @@ function Helicopter(props) {
         <Divider />
         <span>
           <h3 className='drawerContentTitle'>Minimum Fuselage Length</h3>
-          <p>{`${fuseLength} meters`}</p>
+          <p>{`${fuselageLength} meters`}</p>
         </span>
         <Slider
-          defaultValue={fuseLength}
+          defaultValue={fuselageLength}
           min={50}
           max={200}
-          onChange={setFuseLength}
+          onChange={setFuselageLength}
           onAfterChange={handleSlider}
         />
         <Divider />
@@ -208,7 +208,7 @@ function Helicopter(props) {
           defaultValue={rotorDiam}
           min={10}
           max={100}
-          onChange={setRotorDiam}
+          onChange={setRotorDiameter}
           onAfterChange={handleSlider}
         />
         <Divider />
