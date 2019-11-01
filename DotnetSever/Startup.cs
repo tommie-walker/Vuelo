@@ -1,24 +1,14 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
-using RSIVueloAPI.Helpers;
 using RSIVueloAPI.Models;
 using RSIVueloAPI.Services;
 using Swashbuckle.AspNetCore.Swagger;
-using System;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
+
 
 namespace RSIVueloAPI
 {

@@ -1,23 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using RSIVueloAPI.Models;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using RSIVueloAPI.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using RSIVueloAPI.Helpers;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Antiforgery;
 
 namespace RSIVueloAPI.Controllers
 {

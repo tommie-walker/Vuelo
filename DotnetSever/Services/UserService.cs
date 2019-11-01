@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using RSIVueloAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web.Http.Filters;
-using System.Web.Http.Controllers;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Net;
 
@@ -37,17 +30,15 @@ namespace RSIVueloAPI.Services
         {
             User newUser = new User(user);
 
-            // all newly created users will have 'user' role, empty favorites list and [id] attribute set by MongoDB
             newUser.Role = "user";
             newUser.favorites = new List<string>();
             newUser.Id = null;
 
-            if (string.IsNullOrWhiteSpace(user.Password)) // required password field
+            if (string.IsNullOrWhiteSpace(user.Password)) 
                 return null;
-            if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) // true if dupe user is found, otherwise false
+            if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
                 return null;
 
-            // password hashing
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
 
@@ -60,13 +51,11 @@ namespace RSIVueloAPI.Services
 
         public void Update(string id, User userIn, string password = null)
         {
-            // don't allow users to be updated to admin and edit [id] attribute
             userIn.Role = "user";
             userIn.Id = id;
 
             if (userIn == null) throw new ApplicationException("User not found");
 
-            // update password w/ hash values, if any 
             if (!string.IsNullOrWhiteSpace(password))
             {
                 byte[] passwordHash, passwordSalt;
@@ -90,24 +79,19 @@ namespace RSIVueloAPI.Services
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            // null if user is not in the database
             User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
             if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) 
                 return user;
-            else // user not found or wrong password
+            else 
                 return null;
         }
 
         public User ForgotPassword(string emailAddress)
         {
-            if (string.IsNullOrEmpty(emailAddress))
-                return null;
-
-            // null if user is not in database
             User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
-            if (user == null)
+            if (user == null || string.IsNullOrEmpty(emailAddress))
                 return null;
 
             SmtpClient client = new SmtpClient("smtp.gmail.com");
@@ -136,7 +120,6 @@ namespace RSIVueloAPI.Services
             if (string.IsNullOrEmpty(password))
                 return null;
 
-            // new password not empty, so generate new password w/ hash and salt
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
