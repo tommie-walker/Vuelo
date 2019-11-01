@@ -57,7 +57,7 @@ function App() {
           render={() => <AddHeli />}
         />
         <Route
-          path={`/heliDetailPage/:id`}
+          path={`/heliDetailPage/:_id`}
           exact
           render={() => <HeliDetailPage />}
         />

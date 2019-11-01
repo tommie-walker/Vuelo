@@ -1,9 +1,11 @@
 package com.vuelo.Helicopter20;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Document(collection = "Helicopters")
 @Builder
@@ -13,15 +15,16 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @ToString
 public class Helicopter {
+    String _id;
     String type;
     @Field
     String model;
-    int capacityWeight;
-    int crewMax;
-    int crewMin;
-    double fuselageLength;
-    double height;
-    double rotorDiameter;
-    int maxSpeed;
+    String capacityWeight;
+    String crewMax;
+    String crewMin;
+    String fuselageLength;
+    String height;
+    String rotorDiameter;
+    String maxSpeed;
     String url;
 }
