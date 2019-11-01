@@ -36,7 +36,7 @@ namespace RSIVueloAPI.Controllers
         public IActionResult Authenticate([FromBody]UserDTO dto)
         {
             var user = _userService.LoginUser(dto.UserName, dto.Password);
-            if (dto == null)
+            if (user == null)
                 return NotFound();
 
             return Ok(new
@@ -89,6 +89,27 @@ namespace RSIVueloAPI.Controllers
                 return StatusCode(StatusCodes.Status404NotFound);
             _userService.Remove(user.Id);
             return Ok(user);
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult ForgotPassword(string emailAddress)
+        {
+            var user = _userService.ForgotPassword(emailAddress);
+            if (user == null)
+                return StatusCode(StatusCodes.Status404NotFound);
+
+            return Ok(user);
+        }
+
+        [HttpPut("[action]")]
+        public IActionResult UpdatePassword(string password, UserDTO userIn)
+        {
+            var user = _userService.Get(userIn.Id);
+            if (user == null)
+                return StatusCode(StatusCodes.Status404NotFound);
+            var newUser = _userService.ChangePassword(password, userIn);
+
+            return Ok(newUser);
         }
     }
 }
