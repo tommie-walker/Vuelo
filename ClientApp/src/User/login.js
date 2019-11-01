@@ -74,6 +74,9 @@ function Login() {
                 onChange={e => setPassword(e.target.value)}
               />
             </Form.Item>
+            <Link to="/passwordReset">
+              <p>Forgot password?</p>
+            </Link>
             <Button
               type="primary"
               htmlType="submit"
@@ -82,6 +85,7 @@ function Login() {
             >
               Sign In
           </Button>
+
             <Link to="/signUp">
               <p>Not a member yet? Sign up!</p>
             </Link>
