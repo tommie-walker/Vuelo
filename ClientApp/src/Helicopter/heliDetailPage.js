@@ -7,9 +7,7 @@ import Banner from '../NavHeader/banner';
 
 const HeliDetailPage = () => {
   let location = useLocation();
-  console.log(location.state)
   const heli = location.state.helicopter;
-
   const [heliUrl] = useState(heli.url);
   const [model, setmodel] = useState(heli.model);
   const [type, setType] = useState(heli.type);
@@ -40,12 +38,14 @@ const HeliDetailPage = () => {
   }
 
   function updateHelicopter() {
-
-    const heli = { type, model, capacityWeight, crewMax, crewMin, fuselageLength, heliHeight, rotorDiam, maxSpeed };
-
-
+    const heli = { type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
     fetch(`${Config.helicopterServiceUrl}`, {
       method: `PUT`,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json'
+      },
+      accepts: 'application/json',
       body: JSON.stringify(heli)
     })
       .then(res => {

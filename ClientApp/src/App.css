@@ -23,7 +23,7 @@
 
 .detailContent {
   font-size: calc(30px + 3vw);
-  height: 100vh;
+  height: fit-content;
 }
 
 .detailListItem {

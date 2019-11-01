@@ -13,10 +13,11 @@ function ForgotPassword() {
   }
 
   function sendEmail() {
-    fetch(`${Config.userServiceUrl}userForgotPassword`, {
+    const Email = { email };
+    fetch(`${Config.userServiceUrl}ForgotPassword`, {
       method: 'POST',
       headers: { type: 'application/JSON' },
-      body: JSON.stringify(email)
+      body: JSON.stringify(Email)
     })
       .then(res => {
         if (!res.ok) {
