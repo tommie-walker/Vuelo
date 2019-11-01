@@ -50,6 +50,7 @@ public class HelicopterController {
         httpResponse.setHeader("Access-Control-Max-Age", "4800");
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             helicopterRepository.insert(heli);
+        //    helicopterRepository.delete(heli._class);
             return heli;
     }
 
