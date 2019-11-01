@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Input, Drawer, Button, Divider, Slider, Radio } from "antd";
+import { Input, Drawer, Button, Divider, Slider, Radio, notification } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
 import Banner from '../NavHeader/banner';
 import HelicopterList from "./helicopter-list";
+import Config from '../config/app.local.config';
 
-function Helicopter(props) {
+function Helicopter() {
   const { Search } = Input;
-  const helicopters = props.helicopters
-  const [filtHeli, setFiltHeli] = useState(helicopters);
+  const [helicopters, setHelicopters] = useState([])
+  const [filtHeli, setFiltHeli] = useState();
   const [typeSelected, setTypeSelected] = useState("All");
   const [visible, setVisible] = useState(false);
   const [capacityWeight, setCapacityWeight] = useState(1000);
@@ -18,6 +19,33 @@ function Helicopter(props) {
   const [heliHeight, setHeliHeight] = useState(1);
   const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
+
+  useEffect(() => {
+    if (isEmpty(helicopters)) {
+      loadData();
+      setFiltHeli(helicopters);
+    }
+  })
+
+  function loadData() {
+    fetch(`${Config.helicopterServiceUrl}`)
+      .then(res => {
+        if (!res.ok) {
+          throw Error(res.statusText);
+        }
+        return res.json();
+      })
+      .then(h => {
+        setHelicopters(h);
+      })
+      .catch(err => {
+        handleError(err);
+      });
+  }
+
+  function handleError() {
+    notification.open("Oh No! Something went wrong!");
+  }
 
   useEffect(() => {
     console.log(filtHeli)

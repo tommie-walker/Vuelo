@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import { Layout, notification } from "antd";
-import Config from "./config/app.local.config";
-import { isEmpty } from 'lodash';
+import { Layout } from "antd";
+
 
 import "antd/dist/antd.css";
 import "./App.css";
@@ -17,39 +16,13 @@ import PrivateRoute from './Components/privateRoute';
 import EmailPrompt from './User/emailPrompt';
 
 function App() {
-  const [helicopters, setHelicopters] = useState([]);
-
-  useEffect(() => {
-    if (isEmpty(helicopters)) {
-      fetch(`${Config.helicopterServiceUrl}`)
-        .then(res => {
-          if (!res.ok) {
-            throw Error(res.statusText);
-          }
-          return res.json();
-        })
-        .then(h => {
-          setHelicopters(h);
-        })
-        .catch(err => {
-          handleError(err);
-        });
-    }
-  }, [helicopters])
-
-  function handleError() {
-    notification.open("Oh No! Something went wrong!");
-  }
-
   return (
     <Router>
       <Layout className="layout">
         <Route
           path="/"
           exact
-          render={() => (
-            <Helicopter helicopters={helicopters} />
-          )}
+          render={() => <Helicopter />}
         />
         <Route
           path="/addHeli"
