@@ -25,8 +25,7 @@ function ForgotPassword() {
         setEmailSent(true)
       })
       .catch(err => {
-        // notification.open(err)
-        console.log(err);
+        notification.open(err)
       })
   }
 
