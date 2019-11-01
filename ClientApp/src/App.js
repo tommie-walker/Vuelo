@@ -51,12 +51,12 @@ function App() {
             <Helicopter helicopters={helicopters} />
           )}
         />
-        <PrivateRoute
+        <Route
           path="/addHeli"
           exact
           render={() => <AddHeli />}
         />
-        <PrivateRoute
+        <Route
           path={`/heliDetailPage/:id`}
           exact
           render={() => <HeliDetailPage />}
