@@ -41,8 +41,8 @@ public class HelicopterController {
         return objectMapper.writeValueAsString(h);
     }
 
-    @PostMapping("api/createHelicopter")
-    public Helicopter createHelicopter(@RequestBody Helicopter heli, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
+    @PostMapping("/api/helicopter/")
+    public Helicopter createHelicopter(@RequestBody Helicopter heli, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
         httpResponse.setHeader("Access-Control-Allow-Headers", "*");

@@ -15,8 +15,8 @@ using System.Net;
 
 namespace RSIVueloAPI.Services
 {
-    public class UserService : IUserService
-    {
+  public class UserService : IUserService
+  {
         private readonly IMongoCollection<User> _users;
 
         public UserService(IUserDatabaseSettings settings)
@@ -178,4 +178,5 @@ namespace RSIVueloAPI.Services
             }
         }
     }
+  }
 }

@@ -7,7 +7,6 @@ const NavHeader = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function toggleMenu() {
-    console.log('here');
     if (menuOpen) {
       setMenuOpen(false);
     } else {
@@ -23,6 +22,7 @@ const NavHeader = (props) => {
           placement='top'
           onClose={() => setMenuOpen(false)}
           visible={menuOpen}
+          height='12vh'
         >
           <Row>
             <Col span={3} offset={1}>

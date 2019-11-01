@@ -4,7 +4,7 @@ import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
 function AddHeli(props) {
-  const [heliModel, setHeliModel] = useState();
+  const [model, setModel] = useState();
   const [type, setType] = useState();
   const [capWeight, setCapWeight] = useState();
   const [crewMax, setCrewMax] = useState();
@@ -12,12 +12,12 @@ function AddHeli(props) {
   const [fuseLength, setFuseLength] = useState();
   const [heliHeight, setHeliHeight] = useState();
   const [rotorDiam, setRotorDiam] = useState();
-  const [src, setSrc] = useState();
+  const [url, setUrl] = useState();
   const [maxSpeed, setMaxSpeed] = useState();
 
 
   function clearFields() {
-    setHeliModel("");
+    setModel("");
     setType("");
     setCapWeight("");
     setCrewMax("");
@@ -25,13 +25,13 @@ function AddHeli(props) {
     setFuseLength("");
     setHeliHeight("");
     setRotorDiam("");
-    setSrc("");
+    setUrl("");
     setMaxSpeed("");
   }
 
   function addNewHelicopter() {
 
-    const newHeli = { type, heliModel, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, src, maxSpeed };
+    const newHeli = { type, model, capWeight, crewMax, crewMin, fuseLength, heliHeight, rotorDiam, url, maxSpeed };
 
 
     fetch(`${Config.HelicopterServiceUrl}createHelicopter`, {
@@ -79,8 +79,8 @@ function AddHeli(props) {
               type="text"
               placeholder="Model"
               name="heliModel"
-              value={heliModel}
-              onChange={e => setHeliModel(e.target.value)}
+              value={model}
+              onChange={e => setModel(e.target.value)}
             />
           </Form.Item>
           <Form.Item>
@@ -149,10 +149,10 @@ function AddHeli(props) {
           <Form.Item>
             <Input
               type="text"
-              placeholder="Image Source"
-              name="src"
-              value={src}
-              onChange={e => setSrc(e.target.value)}
+              placeholder="Image URL"
+              name="url"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" className="addHeliButton">
