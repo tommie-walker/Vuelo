@@ -10,8 +10,10 @@ import "./App.css";
 import Helicopter from "./Helicopter/Helicopter";
 import AddHeli from "./Helicopter/addHeli";
 import HeliDetailPage from "./Helicopter/heliDetailPage";
-import Login from "./Helicopter/login";
-import SignUp from "./Helicopter/signUp";
+import Login from "./User/login";
+import SignUp from "./User/signUp";
+import ChangePassword from './User/changePassword';
+import PrivateRoute from './Components/privateRoute';
 
 function App() {
   const [helicopters, setHelicopters] = useState([]);
@@ -48,15 +50,20 @@ function App() {
             <Helicopter helicopters={helicopters} />
           )}
         />
-        <Route
+        <PrivateRoute
           path="/addHeli"
           exact
           render={() => <AddHeli />}
         />
-        <Route
+        <PrivateRoute
           path={`/heliDetailPage/:id`}
           exact
           render={() => <HeliDetailPage />}
+        />
+        <Route
+          path='/resetPassword'
+          exact
+          render={() => <ChangePassword />}
         />
         <Route
           path="/login"
