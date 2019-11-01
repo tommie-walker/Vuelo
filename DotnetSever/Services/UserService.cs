@@ -177,6 +177,5 @@ namespace RSIVueloAPI.Services
                 return true;
             }
         }
-    }
   }
 }
