@@ -14,6 +14,7 @@ import Login from "./User/login";
 import SignUp from "./User/signUp";
 import ChangePassword from './User/changePassword';
 import PrivateRoute from './Components/privateRoute';
+import EmailPrompt from './User/emailPrompt';
 
 function App() {
   const [helicopters, setHelicopters] = useState([]);
@@ -59,6 +60,11 @@ function App() {
           path={`/heliDetailPage/:_id`}
           exact
           render={() => <HeliDetailPage />}
+        />
+        <Route
+          path={`/forgotPassword`}
+          exact
+          render={() => <EmailPrompt />}
         />
         <Route
           path='/resetPassword'
