@@ -24,10 +24,10 @@ function App() {
           exact
           render={() => <Helicopter />}
         />
-        <Route
+        <PrivateRoute
           path="/addHeli"
           exact
-          render={() => <AddHeli />}
+          component={AddHeli}
         />
         <Route
           path={`/heliDetailPage/:_id`}
