@@ -19,11 +19,7 @@ public class HelicopterController {
     private
     HelicopterRepository helicopterRepository;
 
-    @RequestMapping("/")
-    public String index() {
-        return "Greetings from Spring Boot!";
-    }
-
+    //Get all the helicoipters
     @RequestMapping("/api/helicopter")
     public  String getAllHelicopters() throws JsonProcessingException {
         List<Helicopter> h = helicopterRepository.findAll();
@@ -32,16 +28,13 @@ public class HelicopterController {
         return objectMapper.writeValueAsString(h);
     }
 
-<<<<<<< Updated upstream
-=======
-     @DeleteMapping ("/api/helicopter/{_id}")
-     public void delete(@PathVariable String _id){
+    //delete an existing helicopter
+    @DeleteMapping ("/api/helicopter/{_id}")
+    public void delete(@PathVariable String _id){
         helicopterRepository.deleteById(_id);
      }
-     @PutMapping("/api/helicotper/{_id}")
 
-
->>>>>>> Stashed changes
+     //Creating a new helicopter
     @PostMapping("/api/helicopter")
     public Helicopter createHelicopter(@RequestBody Helicopter heli, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -50,8 +43,31 @@ public class HelicopterController {
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Max-Age", "4800");
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            helicopterRepository.insert(heli);
+        helicopterRepository.insert(heli);
+        return heli;
+    }
+//Todo: controller not hitting database for update
+    @PutMapping("/api/helicopter/{_id}/")
+    Helicopter updateHelicopter(@RequestBody Helicopter heli, @PathVariable String _id){
+        Optional<Helicopter> h = Optional.of(helicopterRepository.findById(_id).get());
+        if(h.isPresent()){
+           Helicopter update =  helicopterRepository.findById(_id).get();
+           update.setModel(heli.model);
+           update.setType(heli.type);
+           update.setCapacityWeight(heli.capacityWeight);
+           update.setCrewMax(heli.crewMax);
+           update.setCrewMin(heli.crewMin);
+           update.setFuselageLength(heli.fuselageLength);
+           update.setHeight(heli.height);
+           update.setRotorDiameter(heli.rotorDiameter);
+           update.setMaxSpeed(heli.maxSpeed);
+           update.setUrl(heli.url);
+           helicopterRepository.save(update);
+           return update;
+        }else{
             return heli;
+        }
+
     }
 
     @RequestMapping("/Helicopter/{model}")
