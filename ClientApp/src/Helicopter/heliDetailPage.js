@@ -19,6 +19,7 @@ const HeliDetailPage = () => {
   const [rotorDiam, setRotorDiameter] = useState(heli.rotorDiameter);
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
   const [auth] = useState(localStorage.getItem("token") || "");
+  const [_id]=  useState(heli._id);
 
   function deleteHeli() {
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
@@ -38,8 +39,8 @@ const HeliDetailPage = () => {
   }
 
   function updateHelicopter() {
-    const heli = { type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
-    fetch(`${Config.helicopterServiceUrl}`, {
+    const heli = {_id,type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
+    fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
       method: `PUT`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
