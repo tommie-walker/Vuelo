@@ -32,7 +32,7 @@ function AddHeli() {
 
   function addNewHelicopter() {
 
-    const newHeli = {type, model, capacityWeight: capWeight, crewMax, crewMin, fuselageLength: fuseLength, height: heliHeight, rotorDiameter: rotorDiam, url, maxSpeed};
+    const newHeli = { type, model, capacityWeight: capWeight, crewMax, crewMin, fuselageLength: fuseLength, height: heliHeight, rotorDiameter: rotorDiam, url, maxSpeed };
     fetch(`${Config.helicopterServiceUrl}`, {
       method: `POST`,
       headers: {
