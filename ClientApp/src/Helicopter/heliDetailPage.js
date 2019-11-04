@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Button, Form, notification, List, Col, Row } from "antd";
+import { Input, Button, Form, notification, List, Col, Row, message } from "antd";
 import { useLocation } from "react-router";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
@@ -33,6 +33,7 @@ const HeliDetailPage = () => {
         if (!res.ok) {
           throw Error(res.statusText);
         }
+        message.success('Your helicopter was deleted!');
       })
       .catch(err => {
         notification["error"]({
@@ -58,6 +59,7 @@ const HeliDetailPage = () => {
         if (!res.ok) {
           throw Error(res.statusText);
         }
+        message.success('Your helicopter was updated!');
       })
       .catch(err => {
         handleError(err);
