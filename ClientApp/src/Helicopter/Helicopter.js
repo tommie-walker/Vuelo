@@ -25,7 +25,7 @@ function Helicopter() {
       loadData();
       setFiltHeli(helicopters);
     }
-  })
+  }, [helicopters])
 
   function loadData() {
     fetch(`${Config.helicopterServiceUrl}`)

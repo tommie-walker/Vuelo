@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Input, Button, Form, notification } from "antd";
+import { Input, Button, Form, notification, message } from "antd";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
-import Helicopter from "./helicopter-list";
 
 function AddHeli() {
   const [model, setModel] = useState();
@@ -44,7 +43,7 @@ function AddHeli() {
         if (!res.ok) {
           throw Error(res.statusText);
         }
-        console.log('here')
+        message.success('Your helicopter was saved!');
         clearFields();
       })
       .catch(err => {
