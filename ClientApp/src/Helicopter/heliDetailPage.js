@@ -23,7 +23,11 @@ const HeliDetailPage = () => {
 
   function deleteHeli() {
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
-      method: `DELETE`
+      method: `DELETE`,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json'
+      }
     })
       .then(res => {
         if (!res.ok) {
@@ -33,7 +37,7 @@ const HeliDetailPage = () => {
       .catch(err => {
         notification["error"]({
           message: "Oh No! Something went wrong!",
-          description: `Sorry about that! Your Helicopter was not deleted`
+          description: `Sorry about that! Your Helicopter was not deleted ${err}`
         });
       });
   }
