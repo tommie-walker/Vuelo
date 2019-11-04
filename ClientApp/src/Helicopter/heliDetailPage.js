@@ -19,7 +19,7 @@ const HeliDetailPage = () => {
   const [rotorDiam, setRotorDiameter] = useState(heli.rotorDiameter);
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
   const [auth] = useState(localStorage.getItem("token") || "");
-  const [_id]=  useState(heli._id);
+  const [_id] = useState(heli._id);
 
   function deleteHeli() {
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
@@ -43,7 +43,8 @@ const HeliDetailPage = () => {
   }
 
   function updateHelicopter() {
-    const heli = {_id,type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
+    const heli = { _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
+    console.log(heli);
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
       method: `PUT`,
       headers: {
@@ -66,7 +67,7 @@ const HeliDetailPage = () => {
   function handleError(err) {
     notification["error"]({
       message: "Oh No! Something went wrong!",
-      description: `Sorry about that! It will be back up and running in a jiffy! We were unable to add your class to the list.`
+      description: `Sorry about that! It will be back up and running in a jiffy! We were unable to add your class to the list.${err}`
     });
   }
 
