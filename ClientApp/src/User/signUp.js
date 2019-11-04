@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, Avatar } from "antd";
+import { Form, Input, Button, Card, Avatar, message } from "antd";
+import { Redirect } from 'react-router-dom';
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
@@ -47,7 +48,7 @@ function SignUp() {
             </Form.Item>
             <Form.Item>
               <Input
-                type="text"
+                type="password"
                 placeholder="Password"
                 name="password"
                 value={password}
@@ -75,9 +76,10 @@ function SignUp() {
       accepts: "application/json",
       body: JSON.stringify(newUser)
     })
-      .then(res => {
-        clearFields();
-        console.log(res);
+      .then(() => {
+        message.success(`User Created: ${newUser.username}`)
+        clearFields()
+        return <Redirect to='/login' />
       })
       .catch(err => {
         console.log(err);
