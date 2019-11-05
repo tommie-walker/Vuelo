@@ -112,7 +112,7 @@ function Helicopter() {
         parseInt(h.maxSpeed) >= maxSpeed
         : h.type === typeSelected &&
         parseInt(h.capacityWeight) >= capacityWeight &&
-        parseInt(h.crewMax) <= crewMax &&
+        parseInt(h.crewMax) >= crewMax &&
         parseInt(h.crewMin) >= crewMin &&
         parseInt(h.fuselageLength) >= fuselageLength &&
         parseInt(h.height) >= heliHeight &&
