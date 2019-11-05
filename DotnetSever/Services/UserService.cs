@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 
 namespace RSIVueloAPI.Services
 {
@@ -37,6 +38,8 @@ namespace RSIVueloAPI.Services
             if (string.IsNullOrWhiteSpace(user.Password)) 
                 return null;
             if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
+                return null;
+            if (!new EmailAddressAttribute().IsValid(user.Email))
                 return null;
 
             byte[] passwordHash, passwordSalt;

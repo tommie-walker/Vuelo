@@ -51,7 +51,7 @@ namespace RSIVueloAPI.Controllers
         {
             var addedUser = _userService.Create(user);
             if (addedUser == null)
-                return StatusCode(StatusCodes.Status409Conflict);
+                return StatusCode(StatusCodes.Status303SeeOther);
 
             return Ok(user);
         }
