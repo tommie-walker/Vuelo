@@ -15,8 +15,9 @@ function ForgotPassword() {
   function sendEmail() {
     const Email = { email };
     fetch(`${Config.userServiceUrl}ForgotPassword`, {
-      method: 'POST',
-      headers: { type: 'application/JSON' },
+      method: "POST",
+      headers: { "Content-Type": "application/JSON" },
+      accepts: "application/json",
       body: JSON.stringify(Email)
     })
       .then(res => {

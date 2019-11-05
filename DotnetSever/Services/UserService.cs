@@ -27,7 +27,7 @@ namespace RSIVueloAPI.Services
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
-        public User Create(UserDTO user)
+        public string Create(UserDTO user)
         {
             User newUser = new User(user);
 
@@ -36,11 +36,13 @@ namespace RSIVueloAPI.Services
             newUser.Id = null;
 
             if (string.IsNullOrWhiteSpace(user.Password)) 
-                return null;
+                return "empty password";
+            if (string.IsNullOrWhiteSpace(user.UserName))
+                return "empty username";
             if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
-                return null;
+                return "duplicate username";
             if (!new EmailAddressAttribute().IsValid(user.Email))
-                return null;
+                return "invalid email";
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
@@ -49,7 +51,7 @@ namespace RSIVueloAPI.Services
             newUser.PasswordSalt = passwordSalt;
 
             _users.InsertOne(newUser);
-            return newUser;
+            return "";
         }
 
         public void Update(string id, User userIn, string password = null)
@@ -77,25 +79,30 @@ namespace RSIVueloAPI.Services
         public void Remove(string id) =>
             _users.DeleteOne(user => user.Id == id);
 
-        public User LoginUser(string username, string password)
+        public KeyValuePair<User, string> LoginUser(string username, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return null;
+            if (string.IsNullOrEmpty(username))
+                return new KeyValuePair<User, string>(null, "empty username");
+            if (string.IsNullOrEmpty(password))
+                return new KeyValuePair<User, string>(null, "empty password");
 
             User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
             if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) 
-                return user;
+                return new KeyValuePair<User, string>(user, "");
             else 
-                return null;
+                return new KeyValuePair<User, string>(null, "wrong password");
         }
 
-        public User ForgotPassword(string emailAddress)
+        public KeyValuePair<User, string> ForgotPassword(string emailAddress)
         {
+            if (string.IsNullOrEmpty(emailAddress))
+                return new KeyValuePair<User, string>(null, "empty password");
+
             User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
-            if (user == null || string.IsNullOrEmpty(emailAddress))
-                return null;
+            if (user == null)
+                return new KeyValuePair<User, string>(null, "user email does not exist");
 
             SmtpClient client = new SmtpClient("smtp.gmail.com");
             client.Port = 587;
@@ -113,7 +120,7 @@ namespace RSIVueloAPI.Services
 
             client.Send(msg);
 
-            return user; 
+            return new KeyValuePair<User, string>(user, ""); 
         }
 
         public User ChangePassword(string password, UserDTO userIn)
