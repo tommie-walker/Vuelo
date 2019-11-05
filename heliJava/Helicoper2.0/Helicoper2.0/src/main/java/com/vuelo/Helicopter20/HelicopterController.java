@@ -47,13 +47,9 @@ public class HelicopterController {
         return heli;
     }
 //Todo: controller not hitting database for update
-    @PutMapping("/api/helicopter/{_id}/")
+    @PutMapping("/api/helicopter/{_id}")
     Helicopter updateHelicopter(@RequestBody Helicopter heli, @PathVariable String _id, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
         Optional<Helicopter> h = Optional.of(helicopterRepository.findById(_id).get());
-        httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
-        httpResponse.setHeader("Access-Control-Allow-Headers", "*");
-        httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
-        httpResponse.setHeader("Access-Control-Max-Age", "4800");
         if(h.isPresent()){
            Helicopter update =  helicopterRepository.findById(_id).get();
            update.setModel(heli.model);

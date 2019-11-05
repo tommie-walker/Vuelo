@@ -82,7 +82,6 @@ namespace RSIVueloAPI.Controllers
             var user = _userService.ForgotPassword(userIn.Email);
             if (user.Key == null)
                 return NotFound(user.Value);
-
             return Ok(user.Key);
         }
 

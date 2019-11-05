@@ -11,7 +11,7 @@ import HeliDetailPage from "./Helicopter/heliDetailPage";
 import Login from "./User/login";
 import SignUp from "./User/signUp";
 import ChangePassword from './User/changePassword';
-import PrivateRoute from './Components/privateRoute';
+import PrivateRoute from './Middleware/privateRoute';
 import EmailPrompt from './User/emailPrompt';
 
 function App() {
