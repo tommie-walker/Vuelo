@@ -77,9 +77,9 @@ namespace RSIVueloAPI.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult ForgotPassword(string emailAddress)
+        public IActionResult ForgotPassword([FromBody]UserDTO userIn)
         {
-            var user = _userService.ForgotPassword(emailAddress);
+            var user = _userService.ForgotPassword(userIn.Email);
             if (user == null)
                 return StatusCode(StatusCodes.Status404NotFound);
 
