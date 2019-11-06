@@ -193,7 +193,7 @@ const HeliDetailPage = () => {
               </Row>
               <Row>
                 <Col span={12}>
-                  <img src={heliUrl} className="detailImg" alt={model} />
+                  <img src={heliUrl ? heliUrl : require('../images/default.png')} className="detailImg" alt={model} />
                 </Col>
                 <Col span={12}>
                   <List
