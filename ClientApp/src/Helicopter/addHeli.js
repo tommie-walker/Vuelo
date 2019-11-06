@@ -70,6 +70,7 @@ function AddHeli() {
               placeholder="Type"
               name="type"
               value={type}
+              required={true}
               onChange={e => setType(e.target.value)}
             />
           </Form.Item>
@@ -79,6 +80,7 @@ function AddHeli() {
               placeholder="Model"
               name="heliModel"
               value={model}
+              required={true}
               onChange={e => setModel(e.target.value)}
             />
           </Form.Item>

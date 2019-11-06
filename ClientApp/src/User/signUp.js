@@ -76,13 +76,16 @@ function SignUp() {
       accepts: "application/json",
       body: JSON.stringify(newUser)
     })
-      .then(() => {
+      .then(res => {
+        if (res.body === 404) throw 'taken';
         message.success(`User Created: ${newUser.username}`)
         clearFields()
         return <Redirect to='/login' />
       })
       .catch(err => {
-        console.log(err);
+        if (err === 'taken') {
+          message.error('That username is already in use.');
+        }
       });
   }
 }
