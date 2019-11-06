@@ -22,41 +22,41 @@ const NavHeader = (props) => {
           placement='top'
           onClose={() => setMenuOpen(false)}
           visible={menuOpen}
-          height='12vh'
+          height='fit-content'
         >
           <Row>
-            <Col span={3} offset={1}>
+            <Col span={auth ? 5 : 8} offset={1}>
               <Link to="/">
-                <h1 className='drawerContentTitle'><Icon type="home" />Home</h1>
+                <h1 className='drawerContentTitle navHeaderFont'><Icon type="home" />Home</h1>
               </Link>
             </Col>
             {auth ?
-              <Col span={5}>
+              <Col span={8}>
                 <Link to="/addHeli">
-                  <h1 className='drawerContentTitle'><Icon type="plus-circle" />Add Helicopter</h1>
+                  <h1 className='drawerContentTitle navHeaderFont'><Icon type="plus-circle" />Add Helicopter</h1>
                 </Link>
               </Col>
               : ''}
             {auth ?
               <>
-                <Col span={3} offset={10}>
+                <Col span={8} offset={1}>
                   <Link to='/' onClick={() => {
                     localStorage.removeItem('username');
                     localStorage.removeItem('favorites');
                     localStorage.removeItem('token');
                     document.location.reload();
                   }}>
-                    <h1 className='drawerContentTitle'><Icon type="profile" />Logout</h1>
+                    <h1 className='drawerContentTitle navHeaderFont loginNav'><Icon type="profile" />Logout</h1>
                   </Link>
                 </Col>
               </>
               :
-              <Col span={3} offset={16}>
+              <Col span={8} offset={6}>
                 <Link to={{
                   pathname: '/login',
                   state: { users: props.users }
                 }}>
-                  <h1 className='drawerContentTitle'><Icon type="profile" />Login</h1>
+                  <h1 className='drawerContentTitle navHeaderFont loginNav'><Icon type="profile" />Login</h1>
                 </Link>
               </Col>
             }

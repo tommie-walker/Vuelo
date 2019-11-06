@@ -17,6 +17,14 @@
   height: fit-content;
 }
 
+.navHeaderFont {
+  font-size: calc(8px + 1vw);
+}
+
+.loginNav {
+  text-align: right;
+}
+
 .smallContent {
   height: 100vh;
 }
