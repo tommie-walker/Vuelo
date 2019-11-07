@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Net;
+using RSIVueloAPI.Helpers;
+using MongoDB.Bson;
 
 namespace RSIVueloAPI.Services
 {
   public class UserService : IUserService
   {
         private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<Verify> _verify;
 
         public UserService(IUserDatabaseSettings settings)
         {
@@ -18,6 +21,7 @@ namespace RSIVueloAPI.Services
             var db = client.GetDatabase(settings.DatabaseName);
 
             _users = db.GetCollection<User>(settings.UserCollectionName);
+            _verify = db.GetCollection<Verify>(settings.VerifyCollectionName);
         }
 
         public List<User> Get() =>
@@ -94,7 +98,33 @@ namespace RSIVueloAPI.Services
             if (user == null || string.IsNullOrEmpty(emailAddress))
                 return null;
 
+            // create user with additional security attributes
+            var token = Guid.NewGuid();
+            //var update = new UpdateDefinitionBuilder<Verify>()
+            //    .Set("UserEmail", user.Email)
+            //    .Set("Token", token)
+            //    .Set("TimeStamp", DateTime.Now)
+            //    .Set("Expire", DateTime.Now.AddSeconds(60));
+            //new CreateIndexOptions { ExpireAfter = new TimeSpan(0, 0, 60) });
+            //var options = new CreateIndexOptions { ExpireAfter = new TimeSpan(0, 0, 60) };
+
+            var verify = new Verify()
+            {
+                UserEmail = user.Email,
+                Token = token,
+                TimeStamp = DateTime.Now,
+                Expire = DateTime.Now.AddSeconds(60)
+            };
+            _verify.InsertOne(verify);
+
+            //_users.UpdateOne(new BsonDocument("email", user.Email), update);
+            var builder = Builders<Verify>.IndexKeys;
+            _verify.Indexes.CreateOne(new CreateIndexModel<Verify>(builder.Ascending(x => x.Expire),
+                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(60) }));
+            //_verify.Indexes.CreateOne(Builders<Verify>.IndexKeys.Ascending("Expire"), new CreateIndexOptions { ExpireAfter = new TimeSpan(0, 0, 60) });
+
             SmtpClient client = new SmtpClient("smtp.gmail.com");
+
             client.Port = 587;
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
@@ -104,8 +134,9 @@ namespace RSIVueloAPI.Services
             msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
             msg.To.Add(emailAddress);
             msg.Subject = "Vuelo Email Verification";
-            var redirect = "https://localhost:5001/login";
-            msg.Body = string.Format("Please click the <a href=\'{0}'> link </a> to verify password", redirect);
+            var redirect = "https://localhost:5001/resetPassword";
+            msg.Body = string.Format("Please copy this to the verification field: {0} <br>" +
+                        "Click the <a href=\'{1}'> link </a> to verify password", token, redirect);
             msg.IsBodyHtml = true;
 
             client.Send(msg);
