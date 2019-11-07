@@ -7,5 +7,7 @@ namespace RSIVueloAPI.Models
         string VerifyCollectionName { get; set; }
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
+        string EmailUser { get; set; }
+        string EmailPass { get; set; }
     }
 }

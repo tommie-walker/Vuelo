@@ -15,6 +15,7 @@ namespace RSIVueloAPI.Services
   {
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<Verify> _verify;
+        private KeyValuePair<string, string> _settings;
 
         public UserService(IUserDatabaseSettings settings)
         {
@@ -23,6 +24,8 @@ namespace RSIVueloAPI.Services
 
             _users = db.GetCollection<User>(settings.UserCollectionName);
             _verify = db.GetCollection<Verify>(settings.VerifyCollectionName);
+
+            _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
         }
 
         public List<User> Get() =>
@@ -115,7 +118,7 @@ namespace RSIVueloAPI.Services
             client.Port = 587;
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential("jo3jo3jo31234@gmail.com", "joeJOEjoe$0$");
+            client.Credentials = new NetworkCredential(_settings.Key, _settings.Value);
 
             MailMessage msg = new MailMessage();
             msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
