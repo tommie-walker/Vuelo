@@ -94,6 +94,9 @@ namespace RSIVueloAPI.Services
 
         public KeyValuePair<User, string> ForgotPassword(string emailAddress)
         {
+            if (string.IsNullOrEmpty(emailAddress))
+                return new KeyValuePair<User, string>(null, "empty password");
+
             User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
             if (user == null)

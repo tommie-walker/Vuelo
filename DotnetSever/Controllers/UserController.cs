@@ -23,7 +23,6 @@ namespace RSIVueloAPI.Controllers
             var user = _userService.LoginUser(dto.UserName, dto.Password);
             if (user.Key == null)
                 return StatusCode(StatusCodes.Status404NotFound, user.Value);
-
             return Ok(new
             {
                 Id = user.Key.Id,
@@ -52,7 +51,6 @@ namespace RSIVueloAPI.Controllers
             var addedUser = _userService.Create(user);
             if (addedUser.Key == null)
                 return StatusCode(StatusCodes.Status409Conflict, addedUser.Value);
-
             return Ok(user);
         }
 
@@ -82,7 +80,6 @@ namespace RSIVueloAPI.Controllers
             var user = _userService.ForgotPassword(userIn.Email);
             if (user.Key == null)
                 return StatusCode(StatusCodes.Status404NotFound, user.Value);
-
             return Ok(user);
         }
 

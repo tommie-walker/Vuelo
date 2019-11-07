@@ -18,7 +18,7 @@ const HelicopterCard = (props) => {
           < Card
             hoverable
             className='helicopter-card'
-            cover={<img alt={props.helicopter.model} src={props.helicopter.url} className='helicopter-Img' />}
+            cover={<img alt={props.helicopter.model} src={props.helicopter.url ? props.helicopter.url : require('../images/default.png')} className='helicopter-Img' />}
           >
             <Meta title={props.helicopter.model} description={props.helicopter.date} />
           </Card >
