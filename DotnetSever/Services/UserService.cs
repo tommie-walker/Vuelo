@@ -7,6 +7,7 @@ using System.Net.Mail;
 using System.Net;
 using RSIVueloAPI.Helpers;
 using MongoDB.Bson;
+using System.ComponentModel.DataAnnotations;
 
 namespace RSIVueloAPI.Services
 {
@@ -30,7 +31,7 @@ namespace RSIVueloAPI.Services
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
-        public User Create(UserDTO user)
+        public KeyValuePair<User, string> Create(UserDTO user)
         {
             User newUser = new User(user);
 
@@ -38,10 +39,10 @@ namespace RSIVueloAPI.Services
             newUser.favorites = new List<string>();
             newUser.Id = null;
 
-            if (string.IsNullOrWhiteSpace(user.Password)) 
-                return null;
             if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
-                return null;
+                return new KeyValuePair<User, string>(null, "username already exist");
+            if (!new EmailAddressAttribute().IsValid(user.Email))
+                return new KeyValuePair<User, string>(null, "invalid email format");
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
@@ -50,7 +51,7 @@ namespace RSIVueloAPI.Services
             newUser.PasswordSalt = passwordSalt;
 
             _users.InsertOne(newUser);
-            return newUser;
+            return new KeyValuePair<User, string>(newUser, "success");
         }
 
         public void Update(string id, User userIn, string password = null)
@@ -78,36 +79,24 @@ namespace RSIVueloAPI.Services
         public void Remove(string id) =>
             _users.DeleteOne(user => user.Id == id);
 
-        public User LoginUser(string username, string password)
+        public KeyValuePair<User, string> LoginUser(string username, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return null;
-
             User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
             if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) 
-                return user;
+                return new KeyValuePair<User, string>(user, "success");
             else 
-                return null;
+                return new KeyValuePair<User, string>(null, "invalid password");
         }
 
-        public User ForgotPassword(string emailAddress)
+        public KeyValuePair<User, string> ForgotPassword(string emailAddress)
         {
             User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
-            if (user == null || string.IsNullOrEmpty(emailAddress))
-                return null;
+            if (user == null)
+                return new KeyValuePair<User, string>(null, "invalid email");
 
-            // create user with additional security attributes
             var token = Guid.NewGuid();
-            //var update = new UpdateDefinitionBuilder<Verify>()
-            //    .Set("UserEmail", user.Email)
-            //    .Set("Token", token)
-            //    .Set("TimeStamp", DateTime.Now)
-            //    .Set("Expire", DateTime.Now.AddSeconds(60));
-            //new CreateIndexOptions { ExpireAfter = new TimeSpan(0, 0, 60) });
-            //var options = new CreateIndexOptions { ExpireAfter = new TimeSpan(0, 0, 60) };
-
             var verify = new Verify()
             {
                 UserEmail = user.Email,
@@ -117,11 +106,9 @@ namespace RSIVueloAPI.Services
             };
             _verify.InsertOne(verify);
 
-            //_users.UpdateOne(new BsonDocument("email", user.Email), update);
             var builder = Builders<Verify>.IndexKeys;
             _verify.Indexes.CreateOne(new CreateIndexModel<Verify>(builder.Ascending(x => x.Expire),
                                                                    new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(60) }));
-            //_verify.Indexes.CreateOne(Builders<Verify>.IndexKeys.Ascending("Expire"), new CreateIndexOptions { ExpireAfter = new TimeSpan(0, 0, 60) });
 
             SmtpClient client = new SmtpClient("smtp.gmail.com");
 
@@ -141,7 +128,7 @@ namespace RSIVueloAPI.Services
 
             client.Send(msg);
 
-            return user; 
+            return new KeyValuePair<User, string>(user, "success"); 
         }
 
         public User ChangePassword(string password, UserDTO userIn)

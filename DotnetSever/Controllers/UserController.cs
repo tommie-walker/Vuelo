@@ -21,15 +21,15 @@ namespace RSIVueloAPI.Controllers
         public IActionResult Authenticate([FromBody]UserDTO dto)
         {
             var user = _userService.LoginUser(dto.UserName, dto.Password);
-            if (user == null)
-                return NotFound();
+            if (user.Key == null)
+                return StatusCode(StatusCodes.Status404NotFound, user.Value);
 
             return Ok(new
             {
-                Id = user.Id,
-                Username = user.UserName,
-                Email = user.Email,
-                Favorites = user.favorites
+                Id = user.Key.Id,
+                Username = user.Key.UserName,
+                Email = user.Key.Email,
+                Favorites = user.Key.favorites
             });
         }
 
@@ -50,8 +50,8 @@ namespace RSIVueloAPI.Controllers
         public ActionResult<User> CreateUser(UserDTO user)
         {
             var addedUser = _userService.Create(user);
-            if (addedUser == null)
-                return StatusCode(StatusCodes.Status409Conflict);
+            if (addedUser.Key == null)
+                return StatusCode(StatusCodes.Status409Conflict, addedUser.Value);
 
             return Ok(user);
         }
@@ -80,8 +80,8 @@ namespace RSIVueloAPI.Controllers
         public IActionResult ForgotPassword([FromBody]UserDTO userIn)
         {
             var user = _userService.ForgotPassword(userIn.Email);
-            if (user == null)
-                return StatusCode(StatusCodes.Status404NotFound);
+            if (user.Key == null)
+                return StatusCode(StatusCodes.Status404NotFound, user.Value);
 
             return Ok(user);
         }
