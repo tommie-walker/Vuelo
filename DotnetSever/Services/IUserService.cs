@@ -7,7 +7,7 @@ namespace RSIVueloAPI.Services
     {
         List<User> Get();
         User Get(string id);
-        string Create(UserDTO user);
+        KeyValuePair<User, string> Create(UserDTO user);
         void Update(string id, User userIn, string password);
         void Remove(User userIn);
         void Remove(string id);

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Net;
+using RSIVueloAPI.Helpers;
+using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 
 namespace RSIVueloAPI.Services
@@ -12,6 +14,8 @@ namespace RSIVueloAPI.Services
   public class UserService : IUserService
   {
         private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<Verify> _verify;
+        private KeyValuePair<string, string> _settings;
 
         public UserService(IUserDatabaseSettings settings)
         {
@@ -19,6 +23,9 @@ namespace RSIVueloAPI.Services
             var db = client.GetDatabase(settings.DatabaseName);
 
             _users = db.GetCollection<User>(settings.UserCollectionName);
+            _verify = db.GetCollection<Verify>(settings.VerifyCollectionName);
+
+            _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
         }
 
         public List<User> Get() =>
@@ -27,7 +34,7 @@ namespace RSIVueloAPI.Services
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
-        public string Create(UserDTO user)
+        public KeyValuePair<User, string> Create(UserDTO user)
         {
             User newUser = new User(user);
 
@@ -35,14 +42,10 @@ namespace RSIVueloAPI.Services
             newUser.favorites = new List<string>();
             newUser.Id = null;
 
-            if (string.IsNullOrWhiteSpace(user.Password)) 
-                return "empty password";
-            if (string.IsNullOrWhiteSpace(user.UserName))
-                return "empty username";
             if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
-                return "duplicate username";
+                return new KeyValuePair<User, string>(null, "username already exist");
             if (!new EmailAddressAttribute().IsValid(user.Email))
-                return "invalid email";
+                return new KeyValuePair<User, string>(null, "invalid email format");
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
@@ -51,7 +54,7 @@ namespace RSIVueloAPI.Services
             newUser.PasswordSalt = passwordSalt;
 
             _users.InsertOne(newUser);
-            return "";
+            return new KeyValuePair<User, string>(newUser, "success");
         }
 
         public void Update(string id, User userIn, string password = null)
@@ -81,17 +84,12 @@ namespace RSIVueloAPI.Services
 
         public KeyValuePair<User, string> LoginUser(string username, string password)
         {
-            if (string.IsNullOrEmpty(username))
-                return new KeyValuePair<User, string>(null, "empty username");
-            if (string.IsNullOrEmpty(password))
-                return new KeyValuePair<User, string>(null, "empty password");
-
             User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
             if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) 
-                return new KeyValuePair<User, string>(user, "");
+                return new KeyValuePair<User, string>(user, "success");
             else 
-                return new KeyValuePair<User, string>(null, "wrong password");
+                return new KeyValuePair<User, string>(null, "invalid password");
         }
 
         public KeyValuePair<User, string> ForgotPassword(string emailAddress)
@@ -102,25 +100,41 @@ namespace RSIVueloAPI.Services
             User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
             if (user == null)
-                return new KeyValuePair<User, string>(null, "user email does not exist");
+                return new KeyValuePair<User, string>(null, "invalid email");
+
+            var token = Guid.NewGuid();
+            var verify = new Verify()
+            {
+                UserEmail = user.Email,
+                Token = token,
+                TimeStamp = DateTime.Now,
+                Expire = DateTime.Now.AddSeconds(60)
+            };
+            _verify.InsertOne(verify);
+
+            var builder = Builders<Verify>.IndexKeys;
+            _verify.Indexes.CreateOne(new CreateIndexModel<Verify>(builder.Ascending(x => x.Expire),
+                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(60) }));
 
             SmtpClient client = new SmtpClient("smtp.gmail.com");
+
             client.Port = 587;
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential("jo3jo3jo31234@gmail.com", "joeJOEjoe$0$");
+            client.Credentials = new NetworkCredential(_settings.Key, _settings.Value);
 
             MailMessage msg = new MailMessage();
             msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
             msg.To.Add(emailAddress);
             msg.Subject = "Vuelo Email Verification";
-            var redirect = "https://localhost:5001/login";
-            msg.Body = string.Format("Please click the <a href=\'{0}'> link </a> to verify password", redirect);
+            var redirect = "https://localhost:5001/resetPassword";
+            msg.Body = string.Format("Please copy this to the verification field: {0} <br>" +
+                        "Click the <a href=\'{1}'> link </a> to verify password", token, redirect);
             msg.IsBodyHtml = true;
 
             client.Send(msg);
 
-            return new KeyValuePair<User, string>(user, ""); 
+            return new KeyValuePair<User, string>(user, "success"); 
         }
 
         public User ChangePassword(string password, UserDTO userIn)
