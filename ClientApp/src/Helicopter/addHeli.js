@@ -87,7 +87,7 @@ function AddHeli() {
           <Form.Item>
             <Input
               type="text"
-              placeholder="Capcity Weight"
+              placeholder="Capacity Weight"
               name="capWeight"
               value={capWeight}
               onChange={e => setCapWeight(e.target.value)}

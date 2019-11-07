@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Drawer, Button, Divider, Slider, Radio, notification } from "antd";
+import { Input, Drawer, Button, Divider, Slider, Radio, notification, Carousel } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
 import Banner from '../NavHeader/banner';
@@ -9,7 +9,7 @@ import Config from '../config/app.local.config';
 function Helicopter() {
   const { Search } = Input;
   const [helicopters, setHelicopters] = useState([])
-  const [filtHeli, setFiltHeli] = useState();
+  const [filtHeli, setFiltHeli] = useState(helicopters);
   const [typeSelected, setTypeSelected] = useState("All");
   const [visible, setVisible] = useState(false);
   const [capacityWeight, setCapacityWeight] = useState(1000);
@@ -20,13 +20,6 @@ function Helicopter() {
   const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
 
-  useEffect(() => {
-    if (isEmpty(helicopters)) {
-      loadData();
-      setFiltHeli(helicopters);
-    }
-  }, [helicopters])
-
   function loadData() {
     fetch(`${Config.helicopterServiceUrl}`)
       .then(res => {
@@ -36,6 +29,7 @@ function Helicopter() {
         return res.json();
       })
       .then(h => {
+        setFiltHeli(h);
         setHelicopters(h);
       })
       .catch(err => {
@@ -43,13 +37,19 @@ function Helicopter() {
       });
   }
 
+  useEffect(() => {
+    console.log(filtHeli);
+  }, [filtHeli]);
+
+  useEffect(() => {
+    if (isEmpty(helicopters)) {
+      loadData();
+    }
+  }, [helicopters])
+
   function handleError() {
     notification.open("Oh No! Something went wrong!");
   }
-
-  useEffect(() => {
-    console.log(filtHeli)
-  }, [filtHeli]);
 
   const radioStyle = {
     display: "block",
@@ -95,9 +95,13 @@ function Helicopter() {
   }
 
   function handleSelected(type) {
-    const helisOfOneType = helicopters.filter(h => h.type === type);
-    setTypeSelected(type);
-    setFiltHeli(helisOfOneType);
+    if (type === "All") {
+      setFiltHeli(helicopters);
+    } else {
+      const helisOfOneType = helicopters.filter(h => h.type === type);
+      setTypeSelected(type);
+      setFiltHeli(helisOfOneType);
+    }
   }
 
   function handleSlider() {
@@ -239,9 +243,6 @@ function Helicopter() {
           onChange={setRotorDiameter}
           onAfterChange={handleSlider}
         />
-        <Divider />
-        <h3 className='drawerContentTitle'>Engine Type</h3>
-        <Divider />
         <span>
           <h3 className='drawerContentTitle'>Minimum Top Speed</h3>
           <p>{`${maxSpeed} knot${maxSpeed === 1 ? "" : "s"}`}</p>
@@ -254,10 +255,14 @@ function Helicopter() {
           onAfterChange={handleSlider}
         />
       </Drawer>
-      <HelicopterList
-        filtHeli={isEmpty(filtHeli) ? helicopters : filtHeli}
-      />
-    </div>
+      {isEmpty(filtHeli) ?
+        < div className='emptyResultMessage'>
+          Sorry! Your search did not match any helicopters in our system.
+        </div >
+        :
+        <HelicopterList filtHeli={filtHeli} />
+      }
+    </div >
   );
 }
 
