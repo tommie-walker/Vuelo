@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -5,10 +6,12 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using RSIVueloAPI.Helpers;
 using RSIVueloAPI.Models;
 using RSIVueloAPI.Services;
 using Swashbuckle.AspNetCore.Swagger;
-
+using System.Text;
 
 namespace RSIVueloAPI
 {
@@ -27,7 +30,38 @@ namespace RSIVueloAPI
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            // configure strongly typed settings objects
+            services.Configure<JWTTokenManager>(Configuration.GetSection("jwtTokenManager"));
+            var token = Configuration.GetSection("jwtTokenManager").Get<JWTTokenManager>();
+            var secret = Encoding.ASCII.GetBytes(token.Secret);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(token.Secret)),
+                    ValidIssuer = token.Issuer,
+                    ValidAudience = token.Audience,
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            TokenValidationParameters validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(secret),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+
+            
 
             // requires using Microsoft.Extensions.Options
             services.Configure<UserDatabaseSettings>(
@@ -72,6 +106,8 @@ namespace RSIVueloAPI
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "User API v1");
             }); // URL: /swagger
 
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();

@@ -23,12 +23,24 @@ namespace RSIVueloAPI.Controllers
             var user = _userService.LoginUser(dto.UserName, dto.Password);
             if (user.Key == null)
                 return StatusCode(StatusCodes.Status404NotFound, user.Value);
+
+            UserDTO userDTO = new UserDTO
+            {
+                UserName = user.Key.UserName,
+                Password = dto.Password,
+                Email = user.Key.Email,
+                favorites = user.Key.favorites,
+                Role = user.Key.Role
+            };
+
+            var jwt = _userService.GenerateJWT(userDTO);
             return Ok(new
             {
                 Id = user.Key.Id,
                 Username = user.Key.UserName,
                 Email = user.Key.Email,
-                Favorites = user.Key.favorites
+                Favorites = user.Key.favorites,
+                token = jwt
             });
         }
 
@@ -84,14 +96,22 @@ namespace RSIVueloAPI.Controllers
         }
 
         [HttpPut("[action]")]
-        public IActionResult UpdatePassword(string password, UserDTO userIn)
+        public IActionResult UpdatePassword(string password, string code)
         {
-            var user = _userService.Get(userIn.Id);
-            if (user == null)
-                return StatusCode(StatusCodes.Status404NotFound);
-            var newUser = _userService.ChangePassword(password, userIn);
-
+            var newUser = _userService.ChangePassword(password, code);
+            if (newUser == null)
+                return NotFound();
             return Ok(newUser);
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult Logout([FromBody]UserDTO userIn)
+        {
+
+            var user = _userService.LogoutUser(userIn);
+            if (user.Key == null)
+                return NotFound();
+            return Ok();
         }
     }
 }
