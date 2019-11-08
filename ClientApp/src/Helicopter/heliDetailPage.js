@@ -46,7 +46,7 @@ const HeliDetailPage = () => {
   function updateHelicopter() {
     const heli = { _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
-      method: `PUT`,
+      method: `PATCH`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },

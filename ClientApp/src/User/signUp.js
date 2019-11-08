@@ -81,17 +81,15 @@ function SignUp() {
     })
       .then(res => {
         if (!res.ok) throw new Error(res.status);
-        if (res.body === 404) throw 'taken';
         message.success(`User Created: ${newUser.username}`)
         clearFields()
         return <Redirect to='/login' />
       })
       .catch(err => {
-        if (err === 'taken') {
-          message.error('That username is already in use.');
-        }
-        message.error("Please enter a valid email");
-        clearFields();
+        console.log(err);
+        message.error('That username is already in use.');
+        setPassword('');
+        setUsername('');
       });
   }
 }

@@ -28,8 +28,10 @@ function ForgotPassword() {
         setEmailSent(true)
       })
       .catch(err => {
-        if (isEmpty(Email)) return;
-        message.error("We don't have that email on file.")
+        if (email) {
+          message.error("We don't have that email on file.");
+          setEmail('');
+        }
       })
   }
 
