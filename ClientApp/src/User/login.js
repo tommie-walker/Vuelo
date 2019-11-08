@@ -44,9 +44,10 @@ function Login() {
         clearFields();
       })
       .catch(err => {
-        if (isEmpty(username) || isEmpty(password)) return;
-        message.error("Invalid Credentials");
-        setPassword('');
+        if (username && password) {
+          message.error("Invalid Credentials");
+          setPassword('');
+        }
       });
   }
 

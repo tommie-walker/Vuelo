@@ -1,54 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, notification, Button, Card, Avatar } from 'antd';
+import { Form, Input, Button, Card, Avatar, message } from 'antd';
 import Config from '../config/app.local.config';
 
 import Banner from '../NavHeader/banner';
 
 function ChangePassword() {
-  const [password1, setPassword1] = useState();
-  const [password2, setPassword2] = useState();
-  const [user, setUser] = useState();
-
-  useEffect(() => {
-    fetch(`${Config.userServiceUrl}userForgotPassword`, {
-      method: 'GET'
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw Error(res.statusText);
-        }
-        return res.json();
-      })
-      .then(user => {
-        setUser(user);
-      })
-      .catch(err => {
-        notification.open(err)
-      })
-  }, []);
+  const [code, setCode] = useState();
+  const [password, setPassword] = useState();
+  const [passwordCheck, setPasswordCheck] = useState();
 
   function changeUserPassword() {
-
-    const updatedUser = {
-      user: user.name,
-      email: user.email,
-      password: password1
+    if (!password === passwordCheck) {
+      return message.error('The passwords you entered do not match');
     }
 
-    if (!password1 === password2) {
-      return notification.open('The passwords you entered do not match');
-    }
+    const userInfo = { code, password }
 
-    fetch(`${Config.userServiceUrl}`, {
+    fetch(`${Config.userServiceUrl}ChangePassword`, {
       method: "PUT",
-      headers: "application/JSON",
-      body: JSON.stringify(updatedUser)
+      headers: { "Conent-Type": "application/JSON" },
+      body: JSON.stringify(userInfo)
     })
+      .then(res => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
       .then(() => {
-        console.log("success")
+        message.success("Your password has been changed.");
       })
       .catch(err => {
-        notification.open('err')
+        console.log(err);
+        message.error("Bad");
       })
   }
 
@@ -65,19 +47,28 @@ function ChangePassword() {
           <Form.Item>
             <Input
               type="text"
-              placeholder="Enter your new Password"
-              name="password1"
-              value={password1}
-              onChange={setPassword1}
+              placeholder="Enter the code from your email."
+              name="code"
+              value={code}
+              onChange={e => setCode(e.target.value)}
             />
           </Form.Item>
           <Form.Item>
             <Input
-              type="text"
+              type="password"
+              placeholder="Enter your new Password"
+              name="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item>
+            <Input
+              type="password"
               placeholder="Verify your new password"
-              name="password2"
-              value={password2}
-              onChange={setPassword2}
+              name="passwordCheck"
+              value={passwordCheck}
+              onChange={e => setPasswordCheck(e.target.value)}
             />
           </Form.Item>
           <Button
