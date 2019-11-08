@@ -30,10 +30,11 @@ function SignUp() {
           >
             <Form.Item>
               <Input
-                type="text"
+                type="email"
                 placeholder="Email"
                 name="email"
                 value={email}
+                required={true}
                 onChange={e => setEmail(e.target.value)}
               />
             </Form.Item>
@@ -43,6 +44,7 @@ function SignUp() {
                 placeholder="Username"
                 name="username"
                 value={username}
+                required={true}
                 onChange={e => setUsername(e.target.value)}
               />
             </Form.Item>
@@ -52,6 +54,7 @@ function SignUp() {
                 placeholder="Password"
                 name="password"
                 value={password}
+                required={true}
                 onChange={e => setPassword(e.target.value)}
               />
             </Form.Item>
@@ -77,6 +80,7 @@ function SignUp() {
       body: JSON.stringify(newUser)
     })
       .then(res => {
+        if (!res.ok) throw new Error(res.status);
         if (res.body === 404) throw 'taken';
         message.success(`User Created: ${newUser.username}`)
         clearFields()
@@ -86,6 +90,8 @@ function SignUp() {
         if (err === 'taken') {
           message.error('That username is already in use.');
         }
+        message.error("Please enter a valid email");
+        clearFields();
       });
   }
 }

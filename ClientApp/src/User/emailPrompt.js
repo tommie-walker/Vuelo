@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Input, notification, Button, Card, Avatar } from 'antd';
+import { Form, Input, message, Button, Card, Avatar } from 'antd';
 import Config from '../config/app.local.config';
+import isEmpty from 'lodash';
 
 import Banner from '../NavHeader/banner';
 
@@ -27,7 +28,8 @@ function ForgotPassword() {
         setEmailSent(true)
       })
       .catch(err => {
-        notification.open(err)
+        if (isEmpty(Email)) return;
+        message.error("We don't have that email on file.")
       })
   }
 
@@ -46,8 +48,9 @@ function ForgotPassword() {
               <Form.Item>
                 <Input
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder="Enter the email address your account is registered with."
                   name="email"
+                  required={true}
                   value={email}
                   onChange={e => handleChange(e.target.value)}
                 />
