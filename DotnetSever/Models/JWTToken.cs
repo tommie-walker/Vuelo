@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RSIVueloAPI.Models
 {
-    public class Verify
+    public class JWTToken
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -15,8 +15,8 @@ namespace RSIVueloAPI.Models
         public string Id { get; set; }
         [BsonElement(elementName: "UserEmail")]
         public string UserEmail { get; set; }
-        [BsonElement(elementName: "Token")]
-        public Guid Token { get; set; }
+        [BsonElement(elementName: "JWTToken")]
+        public string jwtToken { get; set; }
         [BsonElement(elementName: "TimeStamp")]
         public DateTime TimeStamp { get; set; }
         [BsonElement(elementName: "Expire")]

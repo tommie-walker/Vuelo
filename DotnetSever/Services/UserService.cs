@@ -8,14 +8,21 @@ using System.Net;
 using RSIVueloAPI.Helpers;
 using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace RSIVueloAPI.Services
 {
   public class UserService : IUserService
   {
         private readonly IMongoCollection<User> _users;
-        private readonly IMongoCollection<Verify> _verify;
+        private readonly IMongoCollection<EmailAuth> _emailAuth;
+        private readonly IMongoCollection<JWTToken> _jwt;
         private KeyValuePair<string, string> _settings;
+        private JWTTokenManager _tokenManagement;
 
         public UserService(IUserDatabaseSettings settings)
         {
@@ -23,9 +30,77 @@ namespace RSIVueloAPI.Services
             var db = client.GetDatabase(settings.DatabaseName);
 
             _users = db.GetCollection<User>(settings.UserCollectionName);
-            _verify = db.GetCollection<Verify>(settings.VerifyCollectionName);
+            _emailAuth = db.GetCollection<EmailAuth>(settings.EmailAuthCollectionName);
+            _jwt = db.GetCollection<JWTToken>(settings.JWTCollectionName);
 
             _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
+
+            _tokenManagement = new JWTTokenManager
+            {
+                Secret = settings.Secret,
+                Issuer = settings.Issuer,
+                Audience = settings.Auidence,
+                AccessExpiration = settings.AccessExpiration,
+                RefreshExpiration = settings.RefreshExpiration
+            };
+        }
+
+        public string GenerateJWT(UserDTO user)
+        {
+            var expiry = 60;
+            var claim = new[]
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenManagement.Secret));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var jwtToken = new JwtSecurityToken(
+                _tokenManagement.Issuer,
+                _tokenManagement.Audience,
+                claim,
+                expires: DateTime.UtcNow.AddSeconds(expiry),
+                signingCredentials: credentials
+            );
+
+            var TokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            // create timestamp in db
+            var jwt = new JWTToken()
+            {
+                UserEmail = user.Email,
+                jwtToken = TokenString,
+                TimeStamp = DateTime.UtcNow,
+                Expire = DateTime.UtcNow.AddSeconds(expiry)
+            };
+            
+            _jwt.InsertOne(jwt);
+
+            var builder = Builders<JWTToken>.IndexKeys;
+            _jwt.Indexes.CreateOne(new CreateIndexModel<JWTToken>(builder.Ascending(x => x.Expire),
+                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
+
+            return TokenString;
+        }
+
+        public ClaimsPrincipal ValidateJWT(string jwt)
+        {
+            //var xml = "<RSAKeyValue>../Keys/key.private.xml</RSAKeyValue>";
+            //SecurityKey key = KeyHelper.BuildRsaSigningKey(xml);
+
+            //var validateParameters = new TokenValidationParameters
+            //{
+            //    IssuerSigningKey = key,
+            //    RequireSignedTokens = true,
+            //    RequireExpirationTime = true,
+            //    ValidateLifetime = true
+            //};
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(jwt, new TokenValidationParameters(), out var rawValidatedToken);
+            var securityToken = (JwtSecurityToken)rawValidatedToken;
+            return principal;
         }
 
         public List<User> Get() =>
@@ -34,7 +109,7 @@ namespace RSIVueloAPI.Services
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
-        public KeyValuePair<User, string> Create(UserDTO user)
+        public KeyValuePair<User, ErrorCode> Create(UserDTO user)
         {
             User newUser = new User(user);
 
@@ -43,9 +118,11 @@ namespace RSIVueloAPI.Services
             newUser.Id = null;
 
             if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
-                return new KeyValuePair<User, string>(null, "username already exist");
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.UserExist);
+            if (_users.Find(x => x.Email.Equals(user.Email)).Any())
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.EmailExist);
             if (!new EmailAddressAttribute().IsValid(user.Email))
-                return new KeyValuePair<User, string>(null, "invalid email format");
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
@@ -54,7 +131,7 @@ namespace RSIVueloAPI.Services
             newUser.PasswordSalt = passwordSalt;
 
             _users.InsertOne(newUser);
-            return new KeyValuePair<User, string>(newUser, "success");
+            return new KeyValuePair<User, ErrorCode>(newUser, ErrorCode.Success);
         }
 
         public void Update(string id, User userIn, string password = null)
@@ -82,39 +159,52 @@ namespace RSIVueloAPI.Services
         public void Remove(string id) =>
             _users.DeleteOne(user => user.Id == id);
 
-        public KeyValuePair<User, string> LoginUser(string username, string password)
+        public KeyValuePair<User, ErrorCode> LoginUser(string username, string password)
         {
             User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
             if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) 
-                return new KeyValuePair<User, string>(user, "success");
+                return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
             else 
-                return new KeyValuePair<User, string>(null, "invalid password");
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
         }
 
-        public KeyValuePair<User, string> ForgotPassword(string emailAddress)
+        public KeyValuePair<User, ErrorCode> LogoutUser(UserDTO dto)
         {
-            if (string.IsNullOrEmpty(emailAddress))
-                return new KeyValuePair<User, string>(null, "empty password");
+            User user = _users.Find(x => x.UserName.Equals(dto.UserName)).FirstOrDefault();
+            JWTToken jwt = _jwt.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+            // search other security collections here
 
+            if (user == null || jwt == null)
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.Unknown);
+
+            // delete from db
+            _jwt.DeleteOne(temp => temp.UserEmail == jwt.UserEmail);
+
+            return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
+        }
+
+        public KeyValuePair<User, ErrorCode> ForgotPassword(string emailAddress)
+        {
             User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
             if (user == null)
-                return new KeyValuePair<User, string>(null, "invalid email");
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
 
+            var expiry = 60;
             var token = Guid.NewGuid();
-            var verify = new Verify()
+            var emailAuth = new EmailAuth()
             {
                 UserEmail = user.Email,
                 Token = token,
-                TimeStamp = DateTime.Now,
-                Expire = DateTime.Now.AddSeconds(60)
+                TimeStamp = DateTime.UtcNow,
+                Expire = DateTime.UtcNow.AddSeconds(expiry)
             };
-            _verify.InsertOne(verify);
+            _emailAuth.InsertOne(emailAuth);
 
-            var builder = Builders<Verify>.IndexKeys;
-            _verify.Indexes.CreateOne(new CreateIndexModel<Verify>(builder.Ascending(x => x.Expire),
-                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(60) }));
+            var builder = Builders<EmailAuth>.IndexKeys;
+            _emailAuth.Indexes.CreateOne(new CreateIndexModel<EmailAuth>(builder.Ascending(x => x.Expire),
+                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
 
             SmtpClient client = new SmtpClient("smtp.gmail.com");
 
@@ -134,14 +224,15 @@ namespace RSIVueloAPI.Services
 
             client.Send(msg);
 
-            return new KeyValuePair<User, string>(user, "success"); 
+            return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success); 
         }
 
-        public User ChangePassword(string password, UserDTO userIn)
+        public User ChangePassword(string password, string code)
         {
-            User user = new User(userIn);
+            EmailAuth emailAuth = _emailAuth.Find(x => x.Token.Equals(code)).FirstOrDefault();
+            User user = _users.Find(x => x.Email.Equals(emailAuth.UserEmail)).FirstOrDefault();
 
-            if (string.IsNullOrEmpty(password))
+            if (user == null || emailAuth == null)
                 return null;
 
             byte[] passwordHash, passwordSalt;

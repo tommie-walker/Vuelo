@@ -1,19 +1,24 @@
 ﻿using RSIVueloAPI.Models;
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace RSIVueloAPI.Services
 {
     public interface IUserService
     {
+        string GenerateJWT(UserDTO user);
+        ClaimsPrincipal ValidateJWT(string jwt);
         List<User> Get();
         User Get(string id);
-        KeyValuePair<User, string> Create(UserDTO user);
+        KeyValuePair<User, ErrorCode> Create(UserDTO user);
         void Update(string id, User userIn, string password);
         void Remove(User userIn);
         void Remove(string id);
-        KeyValuePair<User, string> LoginUser(string username, string password);
-        KeyValuePair<User, string> ForgotPassword(string emailAddress);
-        User ChangePassword(string password, UserDTO user);
+        KeyValuePair<User, ErrorCode> LoginUser(string username, string password);
+        KeyValuePair<User, ErrorCode> LogoutUser(UserDTO dto);
+        KeyValuePair<User, ErrorCode> ForgotPassword(string emailAddress);
+        User ChangePassword(string password, string code);
 
     }
 }
