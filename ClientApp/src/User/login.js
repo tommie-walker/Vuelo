@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Form, Input, Card, Avatar, Button, notification } from "antd";
+import { Form, Input, Card, Avatar, Button, message } from "antd";
 import { Link } from "react-router-dom";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
+import isEmpty from 'lodash';
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -17,12 +18,12 @@ function Login() {
     window.location.href = '/';
   }
 
-  async function authenticateUser() {
+  function authenticateUser() {
     const user = {
       username: username,
       password: password
     };
-    const response = await fetch(`${Config.userServiceUrl}Authenticate`, {
+    fetch(`${Config.userServiceUrl}Authenticate`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -30,18 +31,23 @@ function Login() {
       },
       accepts: 'application/json',
       body: JSON.stringify(user)
-    });
-    try {
-      const userData = await response.json();
-      if (!response.ok) throw new Error(response.status);
-      localStorage.setItem("username", userData.username);
-      localStorage.setItem("favorites", userData.favorites);
-      localStorage.setItem("token", userData.token);
-      refreshPage();
-      clearFields();
-    } catch (err) {
-      notification.open(err);
-    }
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(userData => {
+        localStorage.setItem("username", userData.username);
+        localStorage.setItem("favorites", userData.favorites);
+        localStorage.setItem("token", userData.token);
+        refreshPage();
+        clearFields();
+      })
+      .catch(err => {
+        if (isEmpty(username) || isEmpty(password)) return;
+        message.error("Invalid Credentials");
+        setPassword('');
+      });
   }
 
   return (
@@ -62,6 +68,7 @@ function Login() {
                 placeholder="Username"
                 name="username"
                 value={username}
+                required={true}
                 onChange={e => setUsername(e.target.value)}
               />
             </Form.Item>
@@ -71,6 +78,7 @@ function Login() {
                 placeholder="Password"
                 name="password"
                 value={password}
+                required={true}
                 onChange={e => setPassword(e.target.value)}
               />
             </Form.Item>

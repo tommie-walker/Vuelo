@@ -17,7 +17,6 @@ const Helicopter = (props) => {
       dataSource={props.filtHeli}
       renderItem={h => (
         <List.Item>
-
           <HelicopterCard helicopter={h} />
         </List.Item>
       )}
