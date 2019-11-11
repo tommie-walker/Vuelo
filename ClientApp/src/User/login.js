@@ -3,7 +3,6 @@ import { Form, Input, Card, Avatar, Button, message } from "antd";
 import { Link } from "react-router-dom";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
-import isEmpty from 'lodash';
 
 function Login() {
   const [username, setUsername] = useState("");

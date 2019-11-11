@@ -38,10 +38,6 @@ function Helicopter() {
   }
 
   useEffect(() => {
-    console.log(filtHeli);
-  }, [filtHeli]);
-
-  useEffect(() => {
     if (isEmpty(helicopters)) {
       loadData();
     }
@@ -57,73 +53,53 @@ function Helicopter() {
     lineHeight: "30px"
   };
 
-  const allTypes = helicopters.map(h => h.type);
-  const uniqueTypes = allTypes.filter(
-    (r, index) => allTypes.indexOf(r) === index
-  );
-  const makeItems = uniqueTypes.map(t => (
-    <Radio
-      value={t}
-      style={radioStyle}
-      className='drawerContentTitle'
-      key={t}
-      onClick={() => handleSelected(t)}
-    >
-      {t}
-    </Radio>
-  ));
+  const types = helicopters.map(h => h.type);
+  const makeItems = types
+    .filter(
+      (h, index) => types.indexOf(h) === index
+    )
+    .map(t => (
+      <Radio
+        value={t}
+        style={radioStyle}
+        className='drawerContentTitle'
+        key={t}
+        onClick={() => handleType(t)}
+      >
+        {t}
+      </Radio>
+    ));
 
-  function handleSearch(value) {
-    const upperCaseSearchValue = value.toUpperCase()
-    const escapedString = escapeStringRegexp(upperCaseSearchValue);
-    const searchResults = helicopters.filter(h => h.model.search(escapedString) === 0);
-    const filteredResults =
-      typeSelected === "All"
-        ? searchResults
-        : searchResults.filter(
-          r =>
-            r.type === typeSelected &&
-            r.capacityWeight >= capacityWeight &&
-            r.crewMax >= crewMax &&
-            r.crewMin >= crewMin &&
-            r.fuselageLength >= fuselageLength &&
-            r.height >= heliHeight &&
-            r.rotorDiameter >= rotorDiam &&
-            r.maxSpeed >= maxSpeed
-        );
-    setFiltHeli(filteredResults);
-  }
-
-  function handleSelected(type) {
-    if (type === "All") {
-      setFiltHeli(helicopters);
-    } else {
-      const helisOfOneType = helicopters.filter(h => h.type === type);
-      setTypeSelected(type);
+  function handleType(type) {
+    const helisOfOneType = helicopters.filter(h => h.type === type);
+    if (type === "All") setFiltHeli(helicopters)
+    else {
+      setTypeSelected(type)
       setFiltHeli(helisOfOneType);
     }
   }
 
-  function handleSlider() {
+  function handleChange(value) {
+    let searchResults = ''
+    if (value) {
+      searchResults = helicopters.filter(h => h.model.search(escapeStringRegexp(value.toUpperCase())) === 0);
+    }
     const sliderResults = helicopters.filter(h =>
-      typeSelected === "All"
-        ? parseInt(h.capacityWeight) >= capacityWeight &&
-        parseInt(h.crewMax) >= crewMax &&
-        parseInt(h.crewMin) >= crewMin &&
-        parseInt(h.fuselageLength) >= fuselageLength &&
-        parseInt(h.height) >= heliHeight &&
-        parseInt(h.rotorDiameter) >= rotorDiam &&
-        parseInt(h.maxSpeed) >= maxSpeed
-        : h.type === typeSelected &&
-        parseInt(h.capacityWeight) >= capacityWeight &&
-        parseInt(h.crewMax) >= crewMax &&
-        parseInt(h.crewMin) >= crewMin &&
-        parseInt(h.fuselageLength) >= fuselageLength &&
-        parseInt(h.height) >= heliHeight &&
-        parseInt(h.rotorDiameter) >= rotorDiam &&
-        parseInt(h.maxSpeed) >= maxSpeed
+      parseInt(h.capacityWeight) >= capacityWeight &&
+      parseInt(h.crewMax) >= crewMax &&
+      parseInt(h.crewMin) >= crewMin &&
+      parseInt(h.fuselageLength) >= fuselageLength &&
+      parseInt(h.height) >= heliHeight &&
+      parseInt(h.rotorDiameter) >= rotorDiam &&
+      parseInt(h.maxSpeed) >= maxSpeed
     );
-    setFiltHeli(sliderResults);
+    const filteredHelis = typeSelected === "All" ?
+      searchResults ?
+        searchResults : sliderResults
+      :
+      searchResults ?
+        searchResults.filter(r => r.type === typeSelected) : sliderResults.filter(h => h.type === typeSelected);
+    setFiltHeli(filteredHelis);
   }
 
   function showDrawer() {
@@ -138,12 +114,8 @@ function Helicopter() {
     <div className='mainContent'>
       <Banner />
       <Search
-        placeholder={`Search for${
-          typeSelected === "All" || isEmpty(typeSelected)
-            ? ""
-            : ` ${typeSelected}`
-          } Helicopters`}
-        onChange={e => handleSearch(e.target.value)}
+        placeholder={`Search for Helicopters`}
+        onChange={e => handleChange(e.target.value)}
         className="search"
         enterButton
       />
@@ -164,7 +136,7 @@ function Helicopter() {
             value={"All"}
             style={radioStyle}
             defaultChecked={true}
-            onClick={() => handleSelected("All")}
+            onClick={() => handleType("All")}
             className='drawerContentTitle'
           >
             All
@@ -181,7 +153,7 @@ function Helicopter() {
           min={1000}
           max={50000}
           onChange={setCapacityWeight}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
         <Divider />
         <span>
@@ -193,7 +165,7 @@ function Helicopter() {
           min={1}
           max={10}
           onChange={setCrewMax}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
         <Divider />
         <span>
@@ -205,7 +177,7 @@ function Helicopter() {
           min={1}
           max={15}
           onChange={setCrewMin}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
         <Divider />
         <span>
@@ -217,7 +189,7 @@ function Helicopter() {
           min={1}
           max={100}
           onChange={setFuselageLength}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
         <Divider />
         <span>
@@ -229,7 +201,7 @@ function Helicopter() {
           min={1}
           max={30}
           onChange={setHeliHeight}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
         <Divider />
         <span>
@@ -241,7 +213,7 @@ function Helicopter() {
           min={10}
           max={100}
           onChange={setRotorDiameter}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
         <span>
           <h3 className='drawerContentTitle'>Minimum Top Speed</h3>
@@ -252,7 +224,7 @@ function Helicopter() {
           min={1}
           max={300}
           onChange={setMaxSpeed}
-          onAfterChange={handleSlider}
+          onAfterChange={() => handleChange('')}
         />
       </Drawer>
       {isEmpty(filtHeli) ?
