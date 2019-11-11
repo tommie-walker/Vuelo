@@ -10,7 +10,7 @@ export default function Banner() {
       <Col span={1} offset={2}>
         <Link to='/'>
           <h1 className="big-title">
-            Helicopters
+            Vuelo
             </h1>
         </Link>
       </Col>
