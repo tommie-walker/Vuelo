@@ -76,7 +76,7 @@
 }
 
 .ant-drawer-mask {
-  height: 200%;
+  position: fixed;
 }
 
 .loginCard {
