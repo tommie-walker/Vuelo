@@ -1,4 +1,4 @@
-package com.vuelo.Helicopter20;
+package com.vuelo.Helicopter20.Entities;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
