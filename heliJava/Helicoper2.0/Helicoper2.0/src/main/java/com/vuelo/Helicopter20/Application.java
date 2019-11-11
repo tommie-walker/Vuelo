@@ -1,5 +1,6 @@
 package com.vuelo.Helicopter20;
 
+import com.vuelo.Helicopter20.Configs.MongoConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;

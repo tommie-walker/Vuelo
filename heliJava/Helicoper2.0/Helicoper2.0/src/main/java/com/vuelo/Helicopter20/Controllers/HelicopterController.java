@@ -1,8 +1,11 @@
-package com.vuelo.Helicopter20;
+package com.vuelo.Helicopter20.Controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.vuelo.Helicopter20.Entities.Helicopter;
+import com.vuelo.Helicopter20.Repositories.HelicopterRepository;
+import com.vuelo.Helicopter20.Services.HelicopterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -18,6 +20,9 @@ public class HelicopterController {
     @Autowired
     private
     HelicopterRepository helicopterRepository;
+
+    @Autowired
+    HelicopterService heliService;
 
     //Get all the helicoipters
     @RequestMapping("/api/helicopter")
@@ -46,33 +51,21 @@ public class HelicopterController {
         helicopterRepository.insert(heli);
         return heli;
     }
-//Todo: controller not hitting database for update
-    @PutMapping("/api/helicopter/{_id}")
-    Helicopter updateHelicopter(@RequestBody Helicopter heli, @PathVariable String _id, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
-        Optional<Helicopter> h = Optional.of(helicopterRepository.findById(_id).get());
-        if(h.isPresent()){
-           Helicopter update =  helicopterRepository.findById(_id).get();
-           update.setModel(heli.model);
-           update.setType(heli.type);
-           update.setCapacityWeight(heli.capacityWeight);
-           update.setCrewMax(heli.crewMax);
-           update.setCrewMin(heli.crewMin);
-           update.setFuselageLength(heli.fuselageLength);
-           update.setHeight(heli.height);
-           update.setRotorDiameter(heli.rotorDiameter);
-           update.setMaxSpeed(heli.maxSpeed);
-           update.setUrl(heli.url);
-           helicopterRepository.save(update);
-           return update;
-        }else{
-            return heli;
-        }
-
+//updating helicopter
+    @PatchMapping("/api/helicopter/{_id}")
+    Helicopter updateHelicopter(@PathVariable String _id, @RequestBody Helicopter heli){
+        return heliService.updateHelicopter(_id, heli);
     }
-
+//finds a specific helicopter model
     @RequestMapping("/Helicopter/{model}")
-    public  String getHelicopterByModel(@PathVariable String model){
-        Helicopter h = helicopterRepository.findByModel(model);
-        return h.toString();
+        public  String getHelicopterByModel(@PathVariable String model){
+            Helicopter h = helicopterRepository.findByModel(model);
+            return h.toString();
+    }
+//Returns users favorite helicopter
+    @RequestMapping("/api/favorites/{email}")
+    public List<Helicopter> getFavoriteHelicopters(@PathVariable String email){
+        //Adam Was here
+        return heliService.getFavoritesByUserEmail(email);
     }
 }
