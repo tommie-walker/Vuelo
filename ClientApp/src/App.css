@@ -75,12 +75,17 @@
   object-fit: cover;
 }
 
+.ant-drawer-mask {
+  height: 200%;
+}
+
 .loginCard {
   width: 60%;
   margin: 10vmin auto;
   height: 50vh;
   text-align: center;
   padding: 1vmin;
+  height: fit-content;
 }
 
 .loginButton {

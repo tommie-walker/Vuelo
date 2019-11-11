@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, message, Button, Card, Avatar } from 'antd';
 import Config from '../config/app.local.config';
-import isEmpty from 'lodash';
 
 import Banner from '../NavHeader/banner';
 
