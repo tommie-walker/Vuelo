@@ -18,10 +18,7 @@ function Login() {
   }
 
   function authenticateUser() {
-    const user = {
-      username: username,
-      password: password
-    };
+    const user = { username, password };
     fetch(`${Config.userServiceUrl}Authenticate`, {
       method: "POST",
       headers: {
@@ -39,6 +36,7 @@ function Login() {
         localStorage.setItem("username", userData.username);
         localStorage.setItem("favorites", userData.favorites);
         localStorage.setItem("token", userData.token);
+        localStorage.setItem("role", userData.role);
         refreshPage();
         clearFields();
       })
