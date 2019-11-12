@@ -140,6 +140,36 @@ namespace RSIVueloAPI.Services
         public void Remove(string id) =>
             _users.DeleteOne(user => user.Id == id);
 
+        public ErrorCode AddHeliFavorite(string newEntry, string username)
+        {
+            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+
+            if (user == null)
+                return ErrorCode.InvalidUser;
+
+            if (user.favorites.Contains(newEntry))
+                return ErrorCode.HeliExist;
+
+            user.favorites.Add(newEntry);
+            _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
+
+            return ErrorCode.Success;
+        }
+
+        public ErrorCode DeleteHeliFavorite(string entry, string username)
+        {
+            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+
+            if (user == null)
+                return ErrorCode.InvalidUser;
+
+            if (!user.favorites.Remove(entry))
+                return ErrorCode.InvalidHeli;
+
+            _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
+            return ErrorCode.Success;
+        }
+
         public KeyValuePair<User, ErrorCode> LoginUser(string username, string password)
         {
             User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();

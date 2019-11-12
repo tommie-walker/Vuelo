@@ -14,6 +14,9 @@ namespace RSIVueloAPI.Services
         void Update(string id, User userIn, string password);
         void Remove(User userIn);
         void Remove(string id);
+        ErrorCode AddHeliFavorite(string newEntry, string username);
+
+        ErrorCode DeleteHeliFavorite(string entry, string username);
         KeyValuePair<User, ErrorCode> LoginUser(string username, string password);
         KeyValuePair<User, ErrorCode> LogoutUser(UserDTO dto);
         KeyValuePair<User, ErrorCode> ForgotPassword(string emailAddress);
