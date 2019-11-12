@@ -8,7 +8,6 @@ namespace RSIVueloAPI.Services
     public interface IUserService
     {
         string GenerateJWT(UserDTO user);
-        ClaimsPrincipal ValidateJWT(string jwt);
         List<User> Get();
         User Get(string id);
         KeyValuePair<User, ErrorCode> Create(UserDTO user);
