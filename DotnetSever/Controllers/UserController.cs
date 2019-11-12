@@ -87,18 +87,18 @@ namespace RSIVueloAPI.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult ForgotPassword([FromBody]UserDTO userIn)
+        public IActionResult ForgotPassword([FromBody]UserDTO dto)
         {
-            var user = _userService.ForgotPassword(userIn.Email);
+            var user = _userService.ForgotPassword(dto.Email);
             if (user.Key == null)
                 return StatusCode(StatusCodes.Status404NotFound, user.Value);
             return Ok(user);
         }
 
         [HttpPut("[action]")]
-        public IActionResult UpdatePassword(string password, string code)
+        public IActionResult UpdatePassword([FromBody]UserDTO dto)
         {
-            var newUser = _userService.ChangePassword(password, code);
+            var newUser = _userService.ChangePassword(dto.Password, dto.Code);
             if (newUser == null)
                 return NotFound();
             return Ok(newUser);

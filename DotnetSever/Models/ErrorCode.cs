@@ -7,7 +7,7 @@ namespace RSIVueloAPI.Models
 {
     public enum ErrorCode
     {
-        InvalidPass,
+        InvalidPass = 1, 
         InvalidEmail,
         UserExist,
         EmailExist,

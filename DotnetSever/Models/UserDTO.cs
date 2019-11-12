@@ -22,5 +22,8 @@ namespace RSIVueloAPI.Models
 
         [JsonProperty("role")]
         public string Role { get; set; }
+
+        [JsonProperty("code")]
+        public string Code { get; set; }
     }
 }

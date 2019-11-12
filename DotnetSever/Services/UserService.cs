@@ -84,25 +84,6 @@ namespace RSIVueloAPI.Services
             return TokenString;
         }
 
-        public ClaimsPrincipal ValidateJWT(string jwt)
-        {
-            //var xml = "<RSAKeyValue>../Keys/key.private.xml</RSAKeyValue>";
-            //SecurityKey key = KeyHelper.BuildRsaSigningKey(xml);
-
-            //var validateParameters = new TokenValidationParameters
-            //{
-            //    IssuerSigningKey = key,
-            //    RequireSignedTokens = true,
-            //    RequireExpirationTime = true,
-            //    ValidateLifetime = true
-            //};
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(jwt, new TokenValidationParameters(), out var rawValidatedToken);
-            var securityToken = (JwtSecurityToken)rawValidatedToken;
-            return principal;
-        }
-
         public List<User> Get() =>
             _users.Find(user => true).ToList();
 
@@ -117,12 +98,12 @@ namespace RSIVueloAPI.Services
             newUser.favorites = new List<string>();
             newUser.Id = null;
 
-            if (_users.Find(x => x.UserName.Equals(user.UserName)).Any()) 
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.UserExist);
-            if (_users.Find(x => x.Email.Equals(user.Email)).Any())
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.EmailExist);
             if (!new EmailAddressAttribute().IsValid(user.Email))
                 return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
+            if (_users.Find(x => x.Email.Equals(user.Email)).Any())
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.EmailExist);
+            if (_users.Find(x => x.UserName.Equals(user.UserName)).Any())
+                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.UserExist);
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
