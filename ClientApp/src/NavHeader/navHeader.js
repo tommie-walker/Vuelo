@@ -6,9 +6,12 @@ const NavHeader = (props) => {
   const username = localStorage.getItem('username');
   const role = localStorage.getItem('role');
   const auth = localStorage.getItem('token');
-  const favorites = localStorage.getItem('favorites');
-  const { user } = useState({ username, auth, role, favorites });
+  const [user, setUser] = useState({ username, auth, role });
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    console.log(user)
+  }, [])
 
   function toggleMenu() {
     if (menuOpen) {
@@ -45,8 +48,8 @@ const NavHeader = (props) => {
               <>
                 <Col span={8}>
                   <Link to={{
-                    pathname: `/users/${username}`,
-                    state: { user: user }
+                    pathname: `/users/${user.username}`,
+                    state: { userasdf: user }
                   }}>
                     <h1 className='drawerContentTitle navHeaderFont'><Icon type="profile" />{username}</h1>
                   </Link>

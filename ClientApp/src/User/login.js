@@ -34,7 +34,6 @@ function Login() {
       })
       .then(userData => {
         localStorage.setItem("username", userData.username);
-        localStorage.setItem("favorites", userData.favorites);
         localStorage.setItem("token", userData.token);
         localStorage.setItem("role", userData.role);
         refreshPage();
