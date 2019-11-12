@@ -9,8 +9,11 @@ namespace RSIVueloAPI.Models
     {
         InvalidPass = 1, 
         InvalidEmail,
+        InvalidUser,
+        InvalidHeli,
         UserExist,
         EmailExist,
+        HeliExist,
         Success,
         Unknown
     }

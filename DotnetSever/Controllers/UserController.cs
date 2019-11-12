@@ -86,6 +86,24 @@ namespace RSIVueloAPI.Controllers
             return Ok(user);
         }
 
+        [HttpPut("[action]")]
+        public IActionResult AddUserFavorite([FromBody]UserDTO dto)
+        {
+            var errorCode = _userService.AddHeliFavorite(dto.heliId, dto.UserName);
+            if (errorCode != ErrorCode.Success)
+                return StatusCode(StatusCodes.Status404NotFound, errorCode);
+            return Ok(errorCode);
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult DeleteUserFavorite([FromBody]UserDTO dto)
+        {
+            var user = _userService.DeleteHeliFavorite(dto.heliId, dto.UserName);
+            if (user != ErrorCode.Success)
+                return StatusCode(StatusCodes.Status404NotFound, user);
+            return Ok(user);
+        }
+
         [HttpPost("[action]")]
         public IActionResult ForgotPassword([FromBody]UserDTO dto)
         {
