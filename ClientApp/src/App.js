@@ -13,6 +13,7 @@ import SignUp from "./User/signUp";
 import ChangePassword from './User/changePassword';
 import PrivateRoute from './Middleware/privateRoute';
 import EmailPrompt from './User/emailPrompt';
+import UserProfile from './User/userProfile';
 
 function App() {
   return (
@@ -42,6 +43,11 @@ function App() {
           path='/resetPassword'
           exact
           render={() => <ChangePassword />}
+        />
+        <Route
+          path='/users/:username'
+          exact
+          render={() => <UserProfile />}
         />
         <Route
           path="/login"

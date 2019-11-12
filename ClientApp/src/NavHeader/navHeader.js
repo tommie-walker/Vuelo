@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon, Drawer, Col, Row } from 'antd';
 import { Link } from 'react-router-dom';
 
 const NavHeader = (props) => {
-  const [auth] = useState(localStorage.getItem('token') || '');
+  const username = localStorage.getItem('username');
+  const role = localStorage.getItem('role');
+  const auth = localStorage.getItem('token');
+  const [user, setUser] = useState({ username, auth, role });
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    console.log(user)
+  }, [])
 
   function toggleMenu() {
     if (menuOpen) {
@@ -30,7 +37,7 @@ const NavHeader = (props) => {
                 <h1 className='drawerContentTitle navHeaderFont'><Icon type="home" />Home</h1>
               </Link>
             </Col>
-            {auth ?
+            {role === "admin" ?
               <Col span={8}>
                 <Link to="/addHeli">
                   <h1 className='drawerContentTitle navHeaderFont'><Icon type="plus-circle" />Add Helicopter</h1>
@@ -39,11 +46,25 @@ const NavHeader = (props) => {
               : ''}
             {auth ?
               <>
+                <Col span={8}>
+                  <Link to={{
+                    pathname: `/users/${user.username}`,
+                    state: { userasdf: user }
+                  }}>
+                    <h1 className='drawerContentTitle navHeaderFont'><Icon type="profile" />{username}</h1>
+                  </Link>
+                </Col>
+              </>
+              : ""
+            }
+            {auth ?
+              <>
                 <Col span={8} offset={1}>
                   <Link to='/' onClick={() => {
                     localStorage.removeItem('username');
                     localStorage.removeItem('favorites');
                     localStorage.removeItem('token');
+                    localStorage.removeItem('role');
                     document.location.reload();
                   }}>
                     <h1 className='drawerContentTitle navHeaderFont loginNav'><Icon type="profile" />Logout</h1>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Drawer, Button, Divider, Slider, Radio, notification, Carousel } from "antd";
+import { Input, Drawer, Button, Divider, Slider, Radio, notification } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
 import Banner from '../NavHeader/banner';
@@ -232,7 +232,7 @@ function Helicopter() {
           Sorry! Your search did not match any helicopters in our system.
         </div >
         :
-        <HelicopterList filtHeli={filtHeli} />
+        <HelicopterList helis={filtHeli} />
       }
     </div >
   );

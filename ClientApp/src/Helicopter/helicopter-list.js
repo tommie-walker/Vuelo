@@ -3,7 +3,7 @@ import { List } from 'antd';
 
 import HelicopterCard from './helicopter-card';
 
-const Helicopter = (props) => {
+const HelicopterList = (props) => {
   return (
     <List
       grid={{
@@ -14,7 +14,7 @@ const Helicopter = (props) => {
         lg: 4,
         xl: 4,
       }}
-      dataSource={props.filtHeli}
+      dataSource={props.helis}
       renderItem={h => (
         <List.Item>
           <HelicopterCard helicopter={h} />
@@ -24,4 +24,4 @@ const Helicopter = (props) => {
   )
 }
 
-export default Helicopter; 
+export default HelicopterList; 
