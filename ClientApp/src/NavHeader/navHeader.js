@@ -1,17 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Icon, Drawer, Col, Row } from 'antd';
 import { Link } from 'react-router-dom';
 
 const NavHeader = (props) => {
-  const username = localStorage.getItem('username');
-  const role = localStorage.getItem('role');
-  const auth = localStorage.getItem('token');
-  const [user, setUser] = useState({ username, auth, role });
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    console.log(user)
-  }, [])
 
   function toggleMenu() {
     if (menuOpen) {
@@ -32,34 +24,34 @@ const NavHeader = (props) => {
           height='fit-content'
         >
           <Row>
-            <Col span={auth ? 5 : 8} offset={1}>
+            <Col span={props.user.token ? props.user.role === 'admin' ? 5 : 6 : 8} offset={1}>
               <Link to="/">
                 <h1 className='drawerContentTitle navHeaderFont'><Icon type="home" />Home</h1>
               </Link>
             </Col>
-            {role === "admin" ?
+            {props.user.role === "admin" ?
               <Col span={8}>
                 <Link to="/addHeli">
                   <h1 className='drawerContentTitle navHeaderFont'><Icon type="plus-circle" />Add Helicopter</h1>
                 </Link>
               </Col>
               : ''}
-            {auth ?
+            {props.user.token ?
               <>
-                <Col span={8}>
+                <Col span={props.user.role === 'admin' ? 4 : 3} offset={props.user.role === 'admin' ? 0 : 9}>
                   <Link to={{
-                    pathname: `/users/${user.username}`,
-                    state: { userasdf: user }
+                    pathname: `/users/${props.user.username}`,
+                    state: { user: props.user }
                   }}>
-                    <h1 className='drawerContentTitle navHeaderFont'><Icon type="profile" />{username}</h1>
+                    <h1 className='drawerContentTitle navHeaderFont'><Icon type="user" />{props.user.username}</h1>
                   </Link>
                 </Col>
               </>
               : ""
             }
-            {auth ?
+            {props.user.token ?
               <>
-                <Col span={8} offset={1}>
+                <Col span={props.user.role === 'admin' ? 5 : 3}>
                   <Link to='/' onClick={() => {
                     localStorage.removeItem('username');
                     localStorage.removeItem('favorites');
@@ -67,16 +59,13 @@ const NavHeader = (props) => {
                     localStorage.removeItem('role');
                     document.location.reload();
                   }}>
-                    <h1 className='drawerContentTitle navHeaderFont loginNav'><Icon type="profile" />Logout</h1>
+                    <h1 className='drawerContentTitle navHeaderFont loginNav logout'><Icon type="profile" />Logout</h1>
                   </Link>
                 </Col>
               </>
               :
               <Col span={8} offset={6}>
-                <Link to={{
-                  pathname: '/login',
-                  state: { users: props.users }
-                }}>
+                <Link to='/login'>
                   <h1 className='drawerContentTitle navHeaderFont loginNav'><Icon type="profile" />Login</h1>
                 </Link>
               </Col>

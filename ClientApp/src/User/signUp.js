@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
-function SignUp() {
+function SignUp(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -18,7 +18,7 @@ function SignUp() {
   return (
     <>
       <div className='mainContent'>
-        <Banner />
+        <Banner user={props.user} />
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
           <h1 className="big-title">Create Account</h1>
