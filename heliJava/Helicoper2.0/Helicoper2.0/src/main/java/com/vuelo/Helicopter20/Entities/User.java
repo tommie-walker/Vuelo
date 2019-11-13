@@ -15,10 +15,9 @@ import java.util.List;
 @ToString
 public class User {
         String _id;
-        String passwordHash;
-        String passwordSalt;
         @Field
         String email;
         List<String> favorites;
         String role;
+        String username;
 }
