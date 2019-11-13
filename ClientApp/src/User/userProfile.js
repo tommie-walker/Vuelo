@@ -7,8 +7,7 @@ import Config from '../config/app.local.config';
 
 const UserProfile = props => {
   let location = useLocation();
-  const user = location.state.userasdf;
-  console.log(user);
+  const user = location.state.user;
   const [favorites, setFavorites] = useState({});
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const UserProfile = props => {
 
   return (
     <div className='mainContent'>
-      <Banner />
+      <Banner user={props.user} />
       <h6 className="big-title">Your Favorites</h6>
       {isEmpty(favorites) ?
         < div className='emptyResultMessage'>You don't have any favorites saved yet! Try adding some so you can find them with ease!</div >

@@ -4,7 +4,7 @@ import Config from '../config/app.local.config';
 
 import Banner from '../NavHeader/banner';
 
-function ChangePassword() {
+function ChangePassword(props) {
   const [code, setCode] = useState();
   const [password, setPassword] = useState();
   const [passwordCheck, setPasswordCheck] = useState();
@@ -36,7 +36,7 @@ function ChangePassword() {
 
   return (
     <div className='mainContent smallContent'>
-      <Banner />
+      <Banner user={props.user} />
       <Card className="loginCard">
         <Avatar size={120} className="loginIcon" icon="user" />
         <h1 className="big-title">Change Password</h1>

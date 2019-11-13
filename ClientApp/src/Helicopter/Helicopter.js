@@ -5,8 +5,9 @@ import escapeStringRegexp from "escape-string-regexp";
 import Banner from '../NavHeader/banner';
 import HelicopterList from "./helicopter-list";
 import Config from '../config/app.local.config';
+import { OmitProps } from "antd/lib/transfer/renderListBody";
 
-function Helicopter() {
+function Helicopter(props) {
   const { Search } = Input;
   const [helicopters, setHelicopters] = useState([])
   const [filtHeli, setFiltHeli] = useState(helicopters);
@@ -112,7 +113,7 @@ function Helicopter() {
 
   return (
     <div className='mainContent'>
-      <Banner />
+      <Banner user={props.user} />
       <Search
         placeholder={`Search for Helicopters`}
         onChange={e => handleChange(e.target.value)}

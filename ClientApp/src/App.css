@@ -49,6 +49,7 @@
 
 .detailListItem {
   font-size: 3vh;
+  color: black;
 }
 
 .ant-input {
@@ -92,6 +93,10 @@
   text-align: center;
   padding: 1vmin;
   height: fit-content;
+}
+
+.logout {
+  color: red;
 }
 
 .loginButton {

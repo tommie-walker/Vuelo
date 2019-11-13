@@ -3,7 +3,7 @@ import { Input, Button, Form, notification, message } from "antd";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
-function AddHeli() {
+function AddHeli(props) {
   const [model, setModel] = useState();
   const [type, setType] = useState();
   const [capWeight, setCapWeight] = useState();
@@ -55,7 +55,7 @@ function AddHeli() {
     <>
 
       <div className='mainContent'>
-        <Banner />
+        <Banner user={props.user} />
         <h6 className='big-title'>Add a Helicopter</h6>
         <Form
           className='inputForm'
