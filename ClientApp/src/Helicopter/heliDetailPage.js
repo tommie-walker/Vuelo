@@ -23,7 +23,7 @@ const HeliDetailPage = props => {
   const [favorite, setFavorite] = useState(false);
 
   function addFavorite() {
-    fetch(`${Config.userServiceUrl}/addFavorite`, {
+    fetch(`${Config.userServiceUrl}/AddUserFavorite`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -40,7 +40,7 @@ const HeliDetailPage = props => {
   };
 
   function removeFavorite() {
-    fetch(`${Config.userServiceUrl}/removeFavorite`, {
+    fetch(`${Config.userServiceUrl}/DeleteUserFavorite`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
