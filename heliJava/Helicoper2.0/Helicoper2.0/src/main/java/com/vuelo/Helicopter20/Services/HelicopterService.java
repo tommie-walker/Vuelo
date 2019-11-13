@@ -20,9 +20,10 @@ public class HelicopterService {
     @Autowired
     private HelicopterRepository helicopterRepository;
 
-//find user then create list of their favorite helicopter
-    public List<Helicopter> getFavoritesByUserEmail(String email){
-        User user = userRepository.findByEmail(email);
+
+    //find user then create list of their favorite helicopter
+    public List<Helicopter> getFavoritesByUserUsername(String username){
+        User user = userRepository.findByUsername(username);
         List<Helicopter> helicopters = new ArrayList<>();
         for(String models : user.getFavorites()){
             helicopters.add(helicopterRepository.findByModel(models));
