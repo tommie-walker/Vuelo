@@ -63,7 +63,7 @@ public class HelicopterController {
             return h.toString();
     }
 //Returns users favorite helicopter
-    @RequestMapping("/api/favorites/{username}")
+    @RequestMapping("/api/helicopter/favorites/{username}")
     public List<Helicopter> getFavoriteHelicopters(@PathVariable String username){
         return heliService.getFavoritesByUserUsername(username);
     }

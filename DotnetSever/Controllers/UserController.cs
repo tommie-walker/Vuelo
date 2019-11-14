@@ -99,7 +99,7 @@ namespace RSIVueloAPI.Controllers
     [HttpPost("[action]")]
     public IActionResult DeleteUserFavorite([FromBody]UserDTO dto)
     {
-      var user = _userService.DeleteHeliFavorite(dto.heliId, dto.UserName);
+      var user = _userService.DeleteHeliFavorite(dto.heliUsername, dto.UserName);
       if (user != ErrorCode.Success)
         return StatusCode(StatusCodes.Status404NotFound, user);
       return Ok(user);

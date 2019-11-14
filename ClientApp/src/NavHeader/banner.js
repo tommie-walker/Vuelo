@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import NavHeader from '../NavHeader/navHeader';
 
-export default function Banner() {
+export default function Banner(props) {
   return (
     <Row className='header'>
       <Col span={1} offset={2}>
@@ -16,7 +16,7 @@ export default function Banner() {
       </Col>
 
       <Col span={1} offset={18}>
-        <NavHeader />
+        <NavHeader {...props} />
       </Col>
     </Row>
   )

@@ -5,7 +5,7 @@ import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
 
-const HeliDetailPage = () => {
+const HeliDetailPage = props => {
   let location = useLocation();
   const heli = location.state.helicopter;
   const [heliUrl] = useState(heli.url);
@@ -18,8 +18,43 @@ const HeliDetailPage = () => {
   const [heliHeight, setHeliHeight] = useState(heli.height);
   const [rotorDiam, setRotorDiameter] = useState(heli.rotorDiameter);
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
-  const [auth] = useState(localStorage.getItem("token") || "");
   const [_id] = useState(heli._id);
+
+  const [favorite, setFavorite] = useState(true);
+
+  function addFavorite() {
+    fetch(`${Config.userServiceUrl}AddUserFavorite`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(model)
+    }).then(res => {
+      if (!res.ok) throw Error(res.statusText);
+      setFavorite(true);
+    })
+      .catch(() => {
+        message.error("Could not be added to favorites")
+      })
+  };
+
+  function removeFavorite() {
+    fetch(`${Config.userServiceUrl}DeleteUserFavorite`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(model)
+    }).then(res => {
+      if (!res.ok) throw Error(res.statusText);
+      setFavorite(true);
+    })
+      .catch(() => {
+        message.error("Could not be added to favorites")
+      })
+  };
 
   function deleteHeli() {
     fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
@@ -30,9 +65,7 @@ const HeliDetailPage = () => {
       }
     })
       .then(res => {
-        if (!res.ok) {
-          throw Error(res.statusText);
-        }
+        if (!res.ok) throw Error(res.statusText);
         message.success('Your helicopter was deleted!');
       })
       .catch(err => {
@@ -73,9 +106,9 @@ const HeliDetailPage = () => {
   return (
     <>
       <div className='detailContent'>
-        <Banner />
-        {auth ? (
+        {props.user.role === 'admin' ? (
           <>
+            <Banner user={props.user} />
             <h6 className="big-title">Edit Helicopter</h6>
             <Form
               onSubmit={event => {
@@ -183,19 +216,41 @@ const HeliDetailPage = () => {
             </Form>
           </>
         ) : (
-            <>
-              <Row>
+            <div style={{
+              backgroundImage: `url("${heliUrl}")`,
+              postion: 'fixed',
+              repeat: 'none',
+              display: 'block',
+              overflow: 'auto',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+              backgroundAttachment: 'fixed',
+              width: '100vw',
+              height: '100vh',
+            }}>
+              <Banner user={props.user} />
+              <Row justify='center'>
                 <Col span={24}>
                   <h6 className="big-title">
                     {type} {model}
                   </h6>
                 </Col>
               </Row>
-              <Row>
-                <Col span={12}>
-                  <img src={heliUrl ? heliUrl : require('../images/default.png')} className="detailImg" alt={model} />
-                </Col>
-                <Col span={12}>
+              {
+                favorite ?
+                  <Button onClick={removeFavorite}>Remove Favorite</Button> :
+                  <Button onClick={addFavorite}>Add to Favorites</Button>
+              }
+
+              <Row justify='center'>
+                <Col
+                  span={20}
+                  offset={2}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.50)'
+                  }}
+                >
                   <List
                     bordered
                     itemLayout="horizontal"
@@ -238,7 +293,7 @@ const HeliDetailPage = () => {
                   </List>
                 </Col>
               </Row>
-            </>
+            </div>
           )}
       </div>
     </>

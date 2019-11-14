@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
-function SignUp() {
+function SignUp(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -18,7 +18,7 @@ function SignUp() {
   return (
     <>
       <div className='mainContent'>
-        <Banner />
+        <Banner user={props.user} />
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
           <h1 className="big-title">Create Account</h1>
@@ -68,11 +68,7 @@ function SignUp() {
   );
 
   function handleSubmit() {
-    const newUser = {
-      email: email,
-      username: username,
-      password: password
-    };
+    const newUser = { email, username, password };
     fetch(`${Config.userServiceUrl}CreateUser`, {
       method: "POST",
       headers: { "Content-Type": "application/json;charset=UTF-8" },
@@ -80,14 +76,16 @@ function SignUp() {
       body: JSON.stringify(newUser)
     })
       .then(res => {
-        if (!res.ok) throw new Error(res.status);
-        message.success(`User Created: ${newUser.username}`)
-        clearFields()
-        return <Redirect to='/login' />
+        if (!res.ok) throw new Error(res.status), res.json()
+        return res.json()
+      })
+      .then(errorCode => {
+        ;
+        message.success(`User Created: ${newUser.username}`);
+        clearFields();
       })
       .catch(err => {
-        console.log(err);
-        message.error('That username is already in use.');
+        message.error('That email or username is already in use.');
         setPassword('');
         setUsername('');
       });

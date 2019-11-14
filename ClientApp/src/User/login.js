@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, Card, Avatar, Button, message } from "antd";
 import { Link } from "react-router-dom";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 
-function Login() {
+function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -50,7 +50,7 @@ function Login() {
   return (
     <>
       <div className='mainContent'>
-        <Banner />
+        <Banner user={props.user} />
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
           <h1 className="big-title">Log In</h1>

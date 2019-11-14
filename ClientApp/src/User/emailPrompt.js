@@ -4,7 +4,7 @@ import Config from '../config/app.local.config';
 
 import Banner from '../NavHeader/banner';
 
-function ForgotPassword() {
+function ForgotPassword(props) {
   const [email, setEmail] = useState();
   const [emailSent, setEmailSent] = useState(false);
 
@@ -36,7 +36,7 @@ function ForgotPassword() {
 
   return (
     <div className='mainContent smallContent'>
-      <Banner />
+      <Banner user={props.user} />
       <Card className="loginCard">
         <Avatar size={120} className="loginIcon" icon="user" />
         {!emailSent ?
