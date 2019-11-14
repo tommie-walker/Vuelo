@@ -32,18 +32,6 @@ namespace RSIVueloAPI
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            // session id options
-            services.AddSession(options =>
-            {
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-                //options.Cookie.Name = "SID";
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Strict;
-                options.IdleTimeout = TimeSpan.FromHours(5);
-                options.Cookie.MaxAge = TimeSpan.FromHours(6);
-            });
-
             services.Configure<JWTTokenManager>(Configuration.GetSection("jwtTokenManager"));
             var token = Configuration.GetSection("jwtTokenManager").Get<JWTTokenManager>();
             var secret = Encoding.ASCII.GetBytes(token.Secret);
