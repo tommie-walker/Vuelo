@@ -21,6 +21,7 @@ namespace RSIVueloAPI.Services
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<EmailAuth> _emailAuth;
         private readonly IMongoCollection<JWTToken> _jwt;
+        private readonly IMongoCollection<Session> _sid;
         private KeyValuePair<string, string> _settings;
         private JWTTokenManager _tokenManagement;
 
@@ -32,6 +33,7 @@ namespace RSIVueloAPI.Services
             _users = db.GetCollection<User>(settings.UserCollectionName);
             _emailAuth = db.GetCollection<EmailAuth>(settings.EmailAuthCollectionName);
             _jwt = db.GetCollection<JWTToken>(settings.JWTCollectionName);
+            _sid = db.GetCollection<Session>(settings.SessionCollectionName);
 
             _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
 
@@ -82,6 +84,28 @@ namespace RSIVueloAPI.Services
                                                                    new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
 
             return TokenString;
+        }
+
+        public ErrorCode SaveSession(UserDTO user, string value)
+        {
+            if (user == null)
+                return ErrorCode.InvalidUser;
+            var expiry = 60;
+            var sid = new Session()
+            {
+                UserEmail = user.Email,
+                SessionId = value,
+                TimeStamp = DateTime.UtcNow,
+                Expire = DateTime.UtcNow.AddSeconds(expiry)
+            };
+
+            _sid.InsertOne(sid);
+
+            var builder = Builders<Session>.IndexKeys;
+            _sid.Indexes.CreateOne(new CreateIndexModel<Session>(builder.Ascending(x => x.Expire),
+                                                                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
+
+            return ErrorCode.Success;
         }
 
         public List<User> Get() =>
@@ -184,13 +208,14 @@ namespace RSIVueloAPI.Services
         {
             User user = _users.Find(x => x.UserName.Equals(dto.UserName)).FirstOrDefault();
             JWTToken jwt = _jwt.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
-            // search other security collections here
+            Session sid = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
 
-            if (user == null || jwt == null)
+            if (user == null || jwt == null || sid == null)
                 return new KeyValuePair<User, ErrorCode>(null, ErrorCode.Unknown);
 
             // delete from db
             _jwt.DeleteOne(temp => temp.UserEmail == jwt.UserEmail);
+            _sid.DeleteOne(temp => temp.UserEmail == sid.UserEmail);
 
             return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
         }

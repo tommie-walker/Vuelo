@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using RSIVueloAPI.Helpers;
 using RSIVueloAPI.Models;
 using RSIVueloAPI.Services;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.Text;
 
 namespace RSIVueloAPI
@@ -107,6 +109,7 @@ namespace RSIVueloAPI
             }); // URL: /swagger
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();

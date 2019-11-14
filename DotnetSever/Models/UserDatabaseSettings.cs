@@ -6,6 +6,7 @@ namespace RSIVueloAPI.Models
         public string UserCollectionName { get; set; }
         public string EmailAuthCollectionName { get; set; }
         public string JWTCollectionName { get; set; }
+        public string SessionCollectionName { get; set; }
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
         public string EmailUser { get; set; }
