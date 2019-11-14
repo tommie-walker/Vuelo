@@ -108,7 +108,7 @@ const HeliDetailPage = props => {
       <div className='detailContent'>
         {props.user.role === 'admin' ? (
           <>
-            <Banner user={props.user} />
+
             <h6 className="big-title">Edit Helicopter</h6>
             <Form
               onSubmit={event => {
@@ -229,7 +229,7 @@ const HeliDetailPage = props => {
               width: '100vw',
               height: '100vh',
             }}>
-              <Banner user={props.user} />
+
               <Row justify='center'>
                 <Col span={24}>
                   <h6 className="big-title">

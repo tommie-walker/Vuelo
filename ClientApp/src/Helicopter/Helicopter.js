@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Input, Drawer, Button, Divider, Slider, Radio, notification } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
-import Banner from '../NavHeader/banner';
 import HelicopterList from "./helicopter-list";
 import Config from '../config/app.local.config';
-import { OmitProps } from "antd/lib/transfer/renderListBody";
 
 function Helicopter(props) {
   const { Search } = Input;
@@ -113,7 +111,7 @@ function Helicopter(props) {
 
   return (
     <div className='mainContent'>
-      <Banner user={props.user} />
+
       <Search
         placeholder={`Search for Helicopters`}
         onChange={e => handleChange(e.target.value)}

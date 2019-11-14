@@ -32,7 +32,6 @@ const UserProfile = props => {
 
   return (
     <div className='mainContent'>
-      <Banner user={props.user} />
       <h6 className="big-title">Your Favorites</h6>
       <HelicopterList helis={favorites} />}
     </div>

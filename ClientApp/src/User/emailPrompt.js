@@ -36,7 +36,7 @@ function ForgotPassword(props) {
 
   return (
     <div className='mainContent smallContent'>
-      <Banner user={props.user} />
+
       <Card className="loginCard">
         <Avatar size={120} className="loginIcon" icon="user" />
         {!emailSent ?

@@ -1,24 +1,46 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Card, Avatar, message } from "antd";
-import { Redirect } from 'react-router-dom';
 import Config from "../config/app.local.config";
-import Banner from '../NavHeader/banner';
 
-function SignUp(props) {
+function SignUp() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
   function clearFields() {
-    setUsername("");
-    setPassword("");
-    setEmail("");
+    setUsername('');
+    setPassword('');
+    setEmail('');
+  }
+
+  function handleSubmit() {
+    const newUser = { email, username, password };
+    fetch(`${Config.userServiceUrl}CreateUser`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json;charset=UTF-8" },
+      accepts: "application/json",
+      body: JSON.stringify(newUser)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(res.status), res.json()
+        return res.json()
+      })
+      .then(errorCode => {
+        ;
+        message.success(`User Created: ${newUser.username}`);
+        clearFields();
+      })
+      .catch(err => {
+        message.error('That email or username is already in use.');
+        setPassword('');
+        setUsername('');
+      });
   }
 
   return (
     <>
       <div className='mainContent'>
-        <Banner user={props.user} />
+
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
           <h1 className="big-title">Create Account</h1>
@@ -66,30 +88,6 @@ function SignUp(props) {
       </div>
     </>
   );
-
-  function handleSubmit() {
-    const newUser = { email, username, password };
-    fetch(`${Config.userServiceUrl}CreateUser`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json;charset=UTF-8" },
-      accepts: "application/json",
-      body: JSON.stringify(newUser)
-    })
-      .then(res => {
-        if (!res.ok) throw new Error(res.status), res.json()
-        return res.json()
-      })
-      .then(errorCode => {
-        ;
-        message.success(`User Created: ${newUser.username}`);
-        clearFields();
-      })
-      .catch(err => {
-        message.error('That email or username is already in use.');
-        setPassword('');
-        setUsername('');
-      });
-  }
 }
 
 export default SignUp;

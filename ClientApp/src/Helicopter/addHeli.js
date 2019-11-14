@@ -53,9 +53,7 @@ function AddHeli(props) {
 
   return (
     <>
-
       <div className='mainContent'>
-        <Banner user={props.user} />
         <h6 className='big-title'>Add a Helicopter</h6>
         <Form
           className='inputForm'

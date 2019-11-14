@@ -1,21 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { Form, Input, Card, Avatar, Button, message } from "antd";
 import { Link } from "react-router-dom";
 import Config from "../config/app.local.config";
-import Banner from '../NavHeader/banner';
+import { UserContext } from "../contexts/UserContext";
 
 function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  function clearFields() {
-    setUsername("");
-    setPassword("");
-  }
-
-  function refreshPage() {
-    window.location.href = '/';
-  }
+  const { updateUser } = useContext(UserContext);
 
   function authenticateUser() {
     const user = { username, password };
@@ -33,11 +26,7 @@ function Login(props) {
         return res.json();
       })
       .then(userData => {
-        localStorage.setItem("username", userData.username);
-        localStorage.setItem("token", userData.token);
-        localStorage.setItem("role", userData.role);
-        refreshPage();
-        clearFields();
+        updateUser({ username: userData.username, role: userData.role, favorites: userData.favorites, token: userData.token });
       })
       .catch(err => {
         if (username && password) {
@@ -50,7 +39,6 @@ function Login(props) {
   return (
     <>
       <div className='mainContent'>
-        <Banner user={props.user} />
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
           <h1 className="big-title">Log In</h1>
