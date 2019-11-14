@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using RSIVueloAPI.Helpers;
 using RSIVueloAPI.Models;
 using RSIVueloAPI.Services;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.Text;
 
 namespace RSIVueloAPI
@@ -29,6 +31,18 @@ namespace RSIVueloAPI
         {
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            // session id options
+            services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+                //options.Cookie.Name = "SID";
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.IdleTimeout = TimeSpan.FromHours(5);
+                options.Cookie.MaxAge = TimeSpan.FromHours(6);
+            });
 
             services.Configure<JWTTokenManager>(Configuration.GetSection("jwtTokenManager"));
             var token = Configuration.GetSection("jwtTokenManager").Get<JWTTokenManager>();
@@ -107,6 +121,7 @@ namespace RSIVueloAPI
             }); // URL: /swagger
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();

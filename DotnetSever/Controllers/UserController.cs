@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using RSIVueloAPI.Models;
 using RSIVueloAPI.Services;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System;
 
 namespace RSIVueloAPI.Controllers
 {
@@ -24,7 +26,7 @@ namespace RSIVueloAPI.Controllers
       if (user.Key == null)
         return StatusCode(StatusCodes.Status404NotFound, user.Value);
 
-      UserDTO userDTO = new UserDTO
+      UserDTO newDTO = new UserDTO
       {
         UserName = user.Key.UserName,
         Password = dto.Password,
@@ -33,7 +35,24 @@ namespace RSIVueloAPI.Controllers
         Role = user.Key.Role
       };
 
-      var jwt = _userService.GenerateJWT(userDTO);
+      var random = Guid.NewGuid().ToString();
+      var jwt = _userService.GenerateJWT(newDTO);
+
+      var options = new CookieOptions()
+      {
+            HttpOnly = true,
+            IsEssential = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddHours(5),
+            MaxAge = TimeSpan.FromHours(6)
+        };
+      Response.Cookies.Append("SID", random, options);
+
+      var errorCode = _userService.SaveSession(newDTO, random);
+      if (errorCode != ErrorCode.Success)
+        return StatusCode(StatusCodes.Status404NotFound, errorCode);
+
       return Ok(new
       {
         Id = user.Key.Id,
@@ -126,11 +145,16 @@ namespace RSIVueloAPI.Controllers
     [HttpPost("[action]")]
     public IActionResult Logout([FromBody]UserDTO userIn)
     {
-
       var user = _userService.LogoutUser(userIn);
       if (user.Key == null)
-        return NotFound();
-      return Ok();
+        return StatusCode(StatusCodes.Status404NotFound, user.Value);
+      
+      foreach (var cookie in Request.Cookies.Keys)
+      {
+        if (cookie == "SID")
+          Response.Cookies.Delete(cookie);
+      }
+      return Ok(user);
     }
   }
 }
