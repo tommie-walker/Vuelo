@@ -3,32 +3,35 @@ using System.Collections.Generic;
 
 namespace RSIVueloAPI.Models
 {
-    public class UserDTO
-    {
-        [JsonProperty("_id")]
-        public string Id { get; set; }
+  public class UserDTO
+  {
+    [JsonProperty("_id")]
+    public string Id { get; set; }
 
-        [JsonProperty("username")]
-        public string UserName { get; set; }
+    [JsonProperty("username")]
+    public string UserName { get; set; }
 
-        [JsonProperty("password")]
-        public string Password { get; set; }
+    [JsonProperty("password")]
+    public string Password { get; set; }
 
-        [JsonProperty("email")]
-        public string Email { get; set; }
+    [JsonProperty("email")]
+    public string Email { get; set; }
 
-        [JsonProperty("favorites")]
-        public List<string> favorites { get; set; }
+    [JsonProperty("favorites")]
+    public List<string> favorites { get; set; }
 
-        [JsonProperty("role")]
-        public string Role { get; set; }
+    [JsonProperty("role")]
+    public string Role { get; set; }
 
-        [JsonProperty("code")]
-        public string Code { get; set; }
+    [JsonProperty("code")]
+    public string Code { get; set; }
 
-        [JsonProperty("heliId")]
-        public string heliId { get; set; }
+    [JsonProperty("heliId")]
+    public string heliId { get; set; }
+
+    [JsonProperty("heliUsername")]
+    public string heliUsername { get; set; }
 
 
-    }
+  }
 }

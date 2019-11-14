@@ -7,11 +7,6 @@ import Banner from '../NavHeader/banner';
 function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [userDataDb, setUserDataDb] = useState('');
-
-  useEffect(() => {
-    console.log(userDataDb);
-  })
 
   function clearFields() {
     setUsername("");

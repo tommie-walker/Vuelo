@@ -20,10 +20,10 @@ const HeliDetailPage = props => {
   const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
   const [_id] = useState(heli._id);
 
-  const [favorite, setFavorite] = useState(false);
+  const [favorite, setFavorite] = useState(true);
 
   function addFavorite() {
-    fetch(`${Config.userServiceUrl}/AddUserFavorite`, {
+    fetch(`${Config.userServiceUrl}AddUserFavorite`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -40,7 +40,7 @@ const HeliDetailPage = props => {
   };
 
   function removeFavorite() {
-    fetch(`${Config.userServiceUrl}/DeleteUserFavorite`, {
+    fetch(`${Config.userServiceUrl}DeleteUserFavorite`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -239,8 +239,8 @@ const HeliDetailPage = props => {
               </Row>
               {
                 favorite ?
-                  <Button onClick={addFavorite}>Remove Favorite</Button> :
-                  <Button onClick={removeFavorite}>Add to Favorites</Button>
+                  <Button onClick={removeFavorite}>Remove Favorite</Button> :
+                  <Button onClick={addFavorite}>Add to Favorites</Button>
               }
 
               <Row justify='center'>

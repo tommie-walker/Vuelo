@@ -68,11 +68,7 @@ function SignUp(props) {
   );
 
   function handleSubmit() {
-    const newUser = {
-      email: email,
-      username: username,
-      password: password
-    };
+    const newUser = { email, username, password };
     fetch(`${Config.userServiceUrl}CreateUser`, {
       method: "POST",
       headers: { "Content-Type": "application/json;charset=UTF-8" },
@@ -80,14 +76,16 @@ function SignUp(props) {
       body: JSON.stringify(newUser)
     })
       .then(res => {
-        if (!res.ok) throw new Error(res.status);
-        message.success(`User Created: ${newUser.username}`)
-        clearFields()
-        return <Redirect to='/login' />
+        if (!res.ok) throw new Error(res.status), res.json()
+        return res.json()
+      })
+      .then(errorCode => {
+        ;
+        message.success(`User Created: ${newUser.username}`);
+        clearFields();
       })
       .catch(err => {
-        console.log(err);
-        message.error('That username is already in use.');
+        message.error('That email or username is already in use.');
         setPassword('');
         setUsername('');
       });
