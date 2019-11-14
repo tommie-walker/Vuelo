@@ -16,9 +16,9 @@ function ChangePassword(props) {
 
     const userInfo = { code, password }
 
-    fetch(`${Config.userServiceUrl}ChangePassword`, {
+    fetch(`${Config.userServiceUrl}UpdatePassword`, {
       method: "PUT",
-      headers: { "Conent-Type": "application/JSON" },
+      headers: { "Content-Type": "application/JSON" },
       body: JSON.stringify(userInfo)
     })
       .then(res => {

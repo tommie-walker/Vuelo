@@ -266,9 +266,11 @@ namespace RSIVueloAPI.Services
         public User ChangePassword(string password, string code)
         {
             EmailAuth emailAuth = _emailAuth.Find(x => x.Token.Equals(code)).FirstOrDefault();
-            User user = _users.Find(x => x.Email.Equals(emailAuth.UserEmail)).FirstOrDefault();
+            if (emailAuth == null)
+                return null;
 
-            if (user == null || emailAuth == null)
+            User user = _users.Find(x => x.Email.Equals(emailAuth.UserEmail)).FirstOrDefault();
+            if (user == null)
                 return null;
 
             byte[] passwordHash, passwordSalt;
