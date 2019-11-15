@@ -3,7 +3,7 @@ import React, { createContext, useState } from 'react';
 export const UserContext = createContext();
 
 const UserContextProvider = props => {
-  const [user, setUser] = useState({ role: 'admin', token: 'asdf', favorites: [], username: 'Brayden' });
+  const [user, setUser] = useState({ role: '', token: '', favorites: [], username: '' });
 
   const updateUser = updatedUser => {
     setUser(updatedUser);

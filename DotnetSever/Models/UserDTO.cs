@@ -26,11 +26,8 @@ namespace RSIVueloAPI.Models
     [JsonProperty("code")]
     public string Code { get; set; }
 
-    [JsonProperty("heliId")]
-    public string heliId { get; set; }
-
-    [JsonProperty("heliUsername")]
-    public string heliUsername { get; set; }
+    [JsonProperty("model")]
+    public string heliModel { get; set; }
 
 
   }
