@@ -1,12 +1,14 @@
 import React, { useState, useContext } from "react";
-import { Form, Input, Card, Avatar, Button, message } from "antd";
-import { Link } from "react-router-dom";
+import { Form, Input, Card, Avatar, Button, message, Divider } from "antd";
+import { Link, useHistory } from "react-router-dom";
 import Config from "../config/app.local.config";
 import { UserContext } from "../contexts/UserContext";
+import Banner from "../NavHeader/banner";
 
 function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  let history = useHistory();
 
   const { updateUser } = useContext(UserContext);
 
@@ -27,6 +29,7 @@ function Login(props) {
       })
       .then(userData => {
         updateUser({ username: userData.username, role: userData.role, favorites: userData.favorites, token: userData.token });
+        history.push('/');
       })
       .catch(err => {
         if (username && password) {
@@ -39,6 +42,7 @@ function Login(props) {
   return (
     <>
       <div className='mainContent'>
+        <Banner />
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
           <h1 className="big-title">Log In</h1>
@@ -67,21 +71,18 @@ function Login(props) {
                 onChange={e => setPassword(e.target.value)}
               />
             </Form.Item>
-            <Link to="/forgotPassword">
-              <p>Forgot password?</p>
-            </Link>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={authenticateUser}
-              className="loginButton"
-            >
+            <Button type="primary" htmlType="submit" onClick={authenticateUser} className="loginButton" >
               Sign In
-          </Button>
-
-            <Link to="/signUp">
-              <p>Not a member yet? Sign up!</p>
-            </Link>
+            </Button>
+            <div>
+              <Link to="/forgotPassword">
+                Forgot password?
+              </Link>
+              <Divider type="vertical" />
+              <Link to="/signUp">
+                Not a member yet? Sign up!
+              </Link>
+            </div>
           </Form>
         </Card>
       </div>

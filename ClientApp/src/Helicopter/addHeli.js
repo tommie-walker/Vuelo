@@ -54,6 +54,7 @@ function AddHeli(props) {
   return (
     <>
       <div className='mainContent'>
+        <Banner />
         <h6 className='big-title'>Add a Helicopter</h6>
         <Form
           className='inputForm'
