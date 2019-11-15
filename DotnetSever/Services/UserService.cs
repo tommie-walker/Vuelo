@@ -13,6 +13,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace RSIVueloAPI.Services
 {
@@ -85,6 +86,33 @@ namespace RSIVueloAPI.Services
                                                                    new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
 
             return TokenString;
+        }
+
+        public void CreateDTO(User user, out UserDTO newDTO)
+        {
+            newDTO = new UserDTO
+            {
+                UserName = user.UserName,
+                Password = "", // leave empty
+                Email = user.Email,
+                favorites = user.favorites,
+                Role = user.Role
+            };
+        }
+
+        public void AssignSessionProperties(out string key, out string random, out CookieOptions options)
+        {
+            key = "SID";
+            random = Guid.NewGuid().ToString();
+            options = new CookieOptions()
+            {
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(5),
+                MaxAge = TimeSpan.FromHours(6)
+            };
         }
 
         public bool SaveSession(UserDTO user, string value)

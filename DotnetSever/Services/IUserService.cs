@@ -1,4 +1,5 @@
-﻿using RSIVueloAPI.Models;
+﻿using Microsoft.AspNetCore.Http;
+using RSIVueloAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -9,6 +10,8 @@ namespace RSIVueloAPI.Services
     {
         string GenerateJWT(UserDTO user);
         bool SaveSession(UserDTO user, string value);
+        void CreateDTO(User user, out UserDTO newDTO);
+        void AssignSessionProperties(out string key, out string random, out CookieOptions options);
         List<User> Get();
         User Get(string id);
         User Create(UserDTO user);
