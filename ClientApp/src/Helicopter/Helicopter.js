@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Input, Drawer, Button, Divider, Slider, Radio, notification } from "antd";
 import { isEmpty } from "lodash";
 import escapeStringRegexp from "escape-string-regexp";
 import HelicopterList from "./helicopter-list";
 import Config from '../config/app.local.config';
+import Banner from "../NavHeader/banner";
+import { HelicopterContext } from '../contexts/HelicopterContext';
 
-function Helicopter(props) {
+function Helicopter() {
   const { Search } = Input;
+  const { helis, updateHelis } = useContext(HelicopterContext);
   const [helicopters, setHelicopters] = useState([])
   const [filtHeli, setFiltHeli] = useState(helicopters);
   const [typeSelected, setTypeSelected] = useState("All");
@@ -28,6 +31,7 @@ function Helicopter(props) {
         return res.json();
       })
       .then(h => {
+        updateHelis(h);
         setFiltHeli(h);
         setHelicopters(h);
       })
@@ -111,7 +115,7 @@ function Helicopter(props) {
 
   return (
     <div className='mainContent'>
-
+      <Banner />
       <Search
         placeholder={`Search for Helicopters`}
         onChange={e => handleChange(e.target.value)}

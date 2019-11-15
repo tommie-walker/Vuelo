@@ -21,27 +21,27 @@ namespace RSIVueloAPI.Controllers
     public IActionResult Authenticate([FromBody]UserDTO dto)
     {
       var user = _userService.LoginUser(dto.UserName, dto.Password);
-      if (user.Key == null)
+      if (user == null)
         return StatusCode(StatusCodes.Status404NotFound, user.Value);
 
       UserDTO userDTO = new UserDTO
       {
-        UserName = user.Key.UserName,
+        UserName = user.UserName,
         Password = dto.Password,
-        Email = user.Key.Email,
-        favorites = user.Key.favorites,
-        Role = user.Key.Role
+        Email = user.Email,
+        favorites = user.favorites,
+        Role = user.Role
       };
 
       var jwt = _userService.GenerateJWT(userDTO);
       return Ok(new
       {
-        Id = user.Key.Id,
-        Username = user.Key.UserName,
-        Email = user.Key.Email,
-        Favorites = user.Key.favorites,
+        Id = user.Id,
+        Username = user.UserName,
+        Email = user.Email,
+        Favorites = user.favorites,
         token = jwt,
-        Role = user.Key.Role
+        Role = user.Role
       });
     }
 
@@ -62,7 +62,7 @@ namespace RSIVueloAPI.Controllers
     public ActionResult<User> CreateUser(UserDTO user)
     {
       var addedUser = _userService.Create(user);
-      if (addedUser.Key == null)
+      if (addeduser == null)
         return StatusCode(StatusCodes.Status409Conflict, addedUser.Value);
       return Ok(user);
     }
@@ -90,16 +90,16 @@ namespace RSIVueloAPI.Controllers
     [HttpPut("[action]")]
     public IActionResult AddUserFavorite([FromBody]UserDTO dto)
     {
-      var errorCode = _userService.AddHeliFavorite(dto.heliId, dto.UserName);
+      var errorCode = _userService.AddHeliFavorite(dto.heliModel, dto.UserName);
       if (errorCode != ErrorCode.Success)
         return StatusCode(StatusCodes.Status404NotFound, errorCode);
       return Ok(errorCode);
     }
 
-    [HttpPost("[action]")]
+    [HttpPut("[action]")]
     public IActionResult DeleteUserFavorite([FromBody]UserDTO dto)
     {
-      var user = _userService.DeleteHeliFavorite(dto.heliUsername, dto.UserName);
+      var user = _userService.DeleteHeliFavorite(dto.heliModel, dto.UserName);
       if (user != ErrorCode.Success)
         return StatusCode(StatusCodes.Status404NotFound, user);
       return Ok(user);
@@ -109,7 +109,7 @@ namespace RSIVueloAPI.Controllers
     public IActionResult ForgotPassword([FromBody]UserDTO dto)
     {
       var user = _userService.ForgotPassword(dto.Email);
-      if (user.Key == null)
+      if (user == null)
         return StatusCode(StatusCodes.Status404NotFound, user.Value);
       return Ok(user);
     }
@@ -128,7 +128,7 @@ namespace RSIVueloAPI.Controllers
     {
 
       var user = _userService.LogoutUser(userIn);
-      if (user.Key == null)
+      if (user == null)
         return NotFound();
       return Ok();
     }

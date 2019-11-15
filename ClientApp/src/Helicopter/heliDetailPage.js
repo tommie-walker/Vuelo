@@ -1,58 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Input, Button, Form, notification, List, Col, Row, message } from "antd";
-import { useLocation } from "react-router";
+import { useParams, useHistory } from "react-router";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
+import { UserContext } from "../contexts/UserContext";
+import { HelicopterContext } from '../contexts/HelicopterContext';
 
+const HeliDetailPage = () => {
+  let history = useHistory();
+  const urlParams = useParams();
+  const heliId = urlParams._id;
+  const { helis } = useContext(HelicopterContext);
+  const { user, updateUser } = useContext(UserContext);
 
-const HeliDetailPage = props => {
-  let location = useLocation();
-  const heli = location.state.helicopter;
-  const [heliUrl] = useState(heli.url);
-  const [model, setmodel] = useState(heli.model);
-  const [type, setType] = useState(heli.type);
-  const [capacityWeight, setCapacityWeight] = useState(heli.capacityWeight);
-  const [crewMax, setCrewMax] = useState(heli.crewMax);
-  const [crewMin, setCrewMin] = useState(heli.crewMin);
-  const [fuselageLength, setFuselageLength] = useState(heli.fuselageLength);
-  const [heliHeight, setHeliHeight] = useState(heli.height);
-  const [rotorDiam, setRotorDiameter] = useState(heli.rotorDiameter);
-  const [maxSpeed, setMaxSpeed] = useState(heli.maxSpeed);
-  const [_id] = useState(heli._id);
+  const heli = helis.filter(h =>
+    heliId === h._id
+  );
 
-  const [favorite, setFavorite] = useState(true);
+  const [heliUrl] = useState(heli[0].url);
+  const [model, setModel] = useState(heli[0].model);
+  const [type, setType] = useState(heli[0].type);
+  const [capacityWeight, setCapacityWeight] = useState(heli[0].capacityWeight);
+  const [crewMax, setCrewMax] = useState(heli[0].crewMax);
+  const [crewMin, setCrewMin] = useState(heli[0].crewMin);
+  const [fuselageLength, setFuselageLength] = useState(heli[0].fuselageLength);
+  const [heliHeight, setHeliHeight] = useState(heli[0].height);
+  const [rotorDiam, setRotorDiameter] = useState(heli[0].rotorDiameter);
+  const [maxSpeed, setMaxSpeed] = useState(heli[0].maxSpeed);
+  const [_id] = useState(heli[0]._id);
+
+  const [favorite, setFavorite] = useState(user.favorites.includes(heli[0].model));
+
 
   function addFavorite() {
+    const userFav = { model, username: user.username }
+    if (!user.username) history.push('/login');
+    if (favorite) return
     fetch(`${Config.userServiceUrl}AddUserFavorite`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(model)
+      body: JSON.stringify(userFav)
     }).then(res => {
       if (!res.ok) throw Error(res.statusText);
       setFavorite(true);
+      updateUser({ ...user, favorites: [...user.favorites, model] });
     })
       .catch(() => {
+        if (!user.username) return
         message.error("Could not be added to favorites")
       })
   };
 
   function removeFavorite() {
+    const userFav = { model, username: user.username }
     fetch(`${Config.userServiceUrl}DeleteUserFavorite`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(model)
+      body: JSON.stringify(userFav)
     }).then(res => {
       if (!res.ok) throw Error(res.statusText);
-      setFavorite(true);
+      setFavorite(false);
     })
       .catch(() => {
-        message.error("Could not be added to favorites")
+        message.error("Could not be removed from favorites")
       })
   };
 
@@ -106,9 +122,9 @@ const HeliDetailPage = props => {
   return (
     <>
       <div className='detailContent'>
-        {props.user.role === 'admin' ? (
+        {user.role === 'admin' ? (
           <>
-
+            <Banner />
             <h6 className="big-title">Edit Helicopter</h6>
             <Form
               onSubmit={event => {
@@ -131,7 +147,7 @@ const HeliDetailPage = props => {
                   placeholder="Model"
                   name="model"
                   value={model}
-                  onChange={e => setmodel(e.target.value)}
+                  onChange={e => setModel(e.target.value)}
                 />
               </Form.Item>
               <Form.Item>
@@ -229,7 +245,7 @@ const HeliDetailPage = props => {
               width: '100vw',
               height: '100vh',
             }}>
-
+              <Banner />
               <Row justify='center'>
                 <Col span={24}>
                   <h6 className="big-title">
@@ -248,7 +264,7 @@ const HeliDetailPage = props => {
                   span={20}
                   offset={2}
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.50)'
+                    backgroundColor: 'rgba(255,255,255,0.85)'
                   }}
                 >
                   <List

@@ -18,273 +18,270 @@ namespace RSIVueloAPI.Services
 {
   public class UserService : IUserService
   {
-        private readonly IMongoCollection<User> _users;
-        private readonly IMongoCollection<EmailAuth> _emailAuth;
-        private readonly IMongoCollection<JWTToken> _jwt;
-        private KeyValuePair<string, string> _settings;
-        private JWTTokenManager _tokenManagement;
+    private readonly IMongoCollection<User> _users;
+    private readonly IMongoCollection<EmailAuth> _emailAuth;
+    private readonly IMongoCollection<JWTToken> _jwt;
+    private KeyValuePair<string, string> _settings;
+    private JWTTokenManager _tokenManagement;
 
-        public UserService(IUserDatabaseSettings settings)
-        {
-            var client = new MongoClient(settings.ConnectionString);
-            var db = client.GetDatabase(settings.DatabaseName);
+    public UserService(IUserDatabaseSettings settings)
+    {
+      var client = new MongoClient(settings.ConnectionString);
+      var db = client.GetDatabase(settings.DatabaseName);
 
-            _users = db.GetCollection<User>(settings.UserCollectionName);
-            _emailAuth = db.GetCollection<EmailAuth>(settings.EmailAuthCollectionName);
-            _jwt = db.GetCollection<JWTToken>(settings.JWTCollectionName);
+      _users = db.GetCollection<User>(settings.UserCollectionName);
+      _emailAuth = db.GetCollection<EmailAuth>(settings.EmailAuthCollectionName);
+      _jwt = db.GetCollection<JWTToken>(settings.JWTCollectionName);
 
-            _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
+      _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
 
-            _tokenManagement = new JWTTokenManager
-            {
-                Secret = settings.Secret,
-                Issuer = settings.Issuer,
-                Audience = settings.Auidence,
-                AccessExpiration = settings.AccessExpiration,
-                RefreshExpiration = settings.RefreshExpiration
-            };
-        }
+      _tokenManagement = new JWTTokenManager
+      {
+        Secret = settings.Secret,
+        Issuer = settings.Issuer,
+        Audience = settings.Auidence,
+        AccessExpiration = settings.AccessExpiration,
+        RefreshExpiration = settings.RefreshExpiration
+      };
+    }
 
-        public string GenerateJWT(UserDTO user)
-        {
-            var expiry = 60;
-            var claim = new[]
-            {
+    public string GenerateJWT(UserDTO user)
+    {
+      var expiry = 60;
+      var claim = new[]
+      {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Role, user.Role)
             };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenManagement.Secret));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenManagement.Secret));
+      var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var jwtToken = new JwtSecurityToken(
-                _tokenManagement.Issuer,
-                _tokenManagement.Audience,
-                claim,
-                expires: DateTime.UtcNow.AddSeconds(expiry),
-                signingCredentials: credentials
-            );
+      var jwtToken = new JwtSecurityToken(
+          _tokenManagement.Issuer,
+          _tokenManagement.Audience,
+          claim,
+          expires: DateTime.UtcNow.AddSeconds(expiry),
+          signingCredentials: credentials
+      );
 
-            var TokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+      var TokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
-            // create timestamp in db
-            var jwt = new JWTToken()
-            {
-                UserEmail = user.Email,
-                jwtToken = TokenString,
-                TimeStamp = DateTime.UtcNow,
-                Expire = DateTime.UtcNow.AddSeconds(expiry)
-            };
-            
-            _jwt.InsertOne(jwt);
+      // create timestamp in db
+      var jwt = new JWTToken()
+      {
+        UserEmail = user.Email,
+        jwtToken = TokenString,
+        TimeStamp = DateTime.UtcNow,
+        Expire = DateTime.UtcNow.AddSeconds(expiry)
+      };
 
-            var builder = Builders<JWTToken>.IndexKeys;
-            _jwt.Indexes.CreateOne(new CreateIndexModel<JWTToken>(builder.Ascending(x => x.Expire),
-                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
+      _jwt.InsertOne(jwt);
 
-            return TokenString;
-        }
+      var builder = Builders<JWTToken>.IndexKeys;
+      _jwt.Indexes.CreateOne(new CreateIndexModel<JWTToken>(builder.Ascending(x => x.Expire),
+                                                             new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
 
-        public List<User> Get() =>
-            _users.Find(user => true).ToList();
+      return TokenString;
+    }
 
-        public User Get(string id) =>
-            _users.Find<User>(user => user.Id == id).FirstOrDefault();
+    public List<User> Get() =>
+        _users.Find(user => true).ToList();
 
-        public KeyValuePair<User, ErrorCode> Create(UserDTO user)
-        {
-            User newUser = new User(user);
+    public User Get(string id) =>
+        _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
-            newUser.Role = "user";
-            newUser.favorites = new List<string>();
-            newUser.Id = null;
+    public User Create(UserDTO user)
+    {
+      User newUser = new User(user);
 
-            if (!new EmailAddressAttribute().IsValid(user.Email))
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
-            if (_users.Find(x => x.Email.Equals(user.Email)).Any())
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.EmailExist);
-            if (_users.Find(x => x.UserName.Equals(user.UserName)).Any())
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.UserExist);
+      newUser.Role = "user";
+      newUser.favorites = new List<string>();
+      newUser.Id = null;
 
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
+      if (!new EmailAddressAttribute().IsValid(user.Email))
+        return null;
+      if (_users.Find(x => x.Email.Equals(user.Email)).Any())
+        return null;
+      if (_users.Find(x => x.UserName.Equals(user.UserName)).Any())
+        return null;
 
-            newUser.PasswordHash = passwordHash;
-            newUser.PasswordSalt = passwordSalt;
+      byte[] passwordHash, passwordSalt;
+      CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
 
-            _users.InsertOne(newUser);
-            return new KeyValuePair<User, ErrorCode>(newUser, ErrorCode.Success);
-        }
+      newUser.PasswordHash = passwordHash;
+      newUser.PasswordSalt = passwordSalt;
 
-        public void Update(string id, User userIn, string password = null)
-        {
-            userIn.Role = "user";
-            userIn.Id = id;
+      _users.InsertOne(newUser);
+      return new KeyValuePair<User, ErrorCode>(newUser, ErrorCode.Success);
+    }
 
-            if (userIn == null) throw new ApplicationException("User not found");
+    public void Update(string id, User userIn, string password = null)
+    {
+      userIn.Role = "user";
+      userIn.Id = id;
 
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+      if (userIn == null) throw new ApplicationException("User not found");
 
-                userIn.PasswordHash = passwordHash;
-                userIn.PasswordSalt = passwordSalt;
-            }
+      if (!string.IsNullOrWhiteSpace(password))
+      {
+        byte[] passwordHash, passwordSalt;
+        CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-            _users.ReplaceOne(user => user.Id == id, userIn);
-        }
+        userIn.PasswordHash = passwordHash;
+        userIn.PasswordSalt = passwordSalt;
+      }
 
-        public void Remove(User userIn) =>
-            _users.DeleteOne(user => user.Id == userIn.Id);
+      _users.ReplaceOne(user => user.Id == id, userIn);
+    }
 
-        public void Remove(string id) =>
-            _users.DeleteOne(user => user.Id == id);
+    public void Remove(User userIn) =>
+        _users.DeleteOne(user => user.Id == userIn.Id);
 
-        public ErrorCode AddHeliFavorite(string newEntry, string username)
-        {
-            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+    public void Remove(string id) =>
+        _users.DeleteOne(user => user.Id == id);
 
-            if (user == null)
-                return ErrorCode.InvalidUser;
+    public ErrorCode AddHeliFavorite(string newEntry, string username)
+    {
+      User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
-            if (user.favorites.Contains(newEntry))
-                return ErrorCode.HeliExist;
+      if (user == null)
+        return ErrorCode.InvalidUser;
 
-            user.favorites.Add(newEntry);
-            _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
+      user.favorites.Add(new string(newEntry));
+      _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
 
-            return ErrorCode.Success;
-        }
+      return ErrorCode.Success;
+    }
 
-        public ErrorCode DeleteHeliFavorite(string entry, string username)
-        {
-            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+    public ErrorCode DeleteHeliFavorite(string entry, string username)
+    {
+      User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
-            if (user == null)
-                return ErrorCode.InvalidUser;
+      if (user == null)
+        return ErrorCode.InvalidUser;
 
-            if (!user.favorites.Remove(entry))
-                return ErrorCode.InvalidHeli;
+      if (!user.favorites.Remove(entry))
+        return ErrorCode.InvalidHeli;
 
-            _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
-            return ErrorCode.Success;
-        }
+      _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
+      return ErrorCode.Success;
+    }
 
-        public KeyValuePair<User, ErrorCode> LoginUser(string username, string password)
-        {
-            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+    public User LoginUser(string username, string password)
+    {
+      User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
 
-            if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)) 
-                return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
-            else 
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
-        }
+      if (user != null && VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+        return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
+      else
+        return null;
+    }
 
-        public KeyValuePair<User, ErrorCode> LogoutUser(UserDTO dto)
-        {
-            User user = _users.Find(x => x.UserName.Equals(dto.UserName)).FirstOrDefault();
-            JWTToken jwt = _jwt.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
-            // search other security collections here
+    public User LogoutUser(UserDTO dto)
+    {
+      User user = _users.Find(x => x.UserName.Equals(dto.UserName)).FirstOrDefault();
+      JWTToken jwt = _jwt.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+      // search other security collections here
 
-            if (user == null || jwt == null)
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.Unknown);
+      if (user == null || jwt == null)
+        return new KeyValuePair<User, ErrorCode>(null, ErrorCode.Unknown);
 
-            // delete from db
-            _jwt.DeleteOne(temp => temp.UserEmail == jwt.UserEmail);
+      // delete from db
+      _jwt.DeleteOne(temp => temp.UserEmail == jwt.UserEmail);
 
-            return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
-        }
+      return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
+    }
 
-        public KeyValuePair<User, ErrorCode> ForgotPassword(string emailAddress)
-        {
-            User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
+    public User ForgotPassword(string emailAddress)
+    {
+      User user = _users.Find(x => x.Email.Equals(emailAddress)).FirstOrDefault();
 
-            if (user == null)
-                return new KeyValuePair<User, ErrorCode>(null, ErrorCode.InvalidEmail);
+      if (user == null)
+        return null;
 
-            var expiry = 60;
-            var token = Guid.NewGuid();
-            var emailAuth = new EmailAuth()
-            {
-                UserEmail = user.Email,
-                Token = token,
-                TimeStamp = DateTime.UtcNow,
-                Expire = DateTime.UtcNow.AddSeconds(expiry)
-            };
-            _emailAuth.InsertOne(emailAuth);
+      var expiry = 60;
+      var token = Guid.NewGuid();
+      var emailAuth = new EmailAuth()
+      {
+        UserEmail = user.Email,
+        Token = token,
+        TimeStamp = DateTime.UtcNow,
+        Expire = DateTime.UtcNow.AddSeconds(expiry)
+      };
+      _emailAuth.InsertOne(emailAuth);
 
-            var builder = Builders<EmailAuth>.IndexKeys;
-            _emailAuth.Indexes.CreateOne(new CreateIndexModel<EmailAuth>(builder.Ascending(x => x.Expire),
-                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
+      var builder = Builders<EmailAuth>.IndexKeys;
+      _emailAuth.Indexes.CreateOne(new CreateIndexModel<EmailAuth>(builder.Ascending(x => x.Expire),
+                                                             new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
 
-            SmtpClient client = new SmtpClient("smtp.gmail.com");
+      SmtpClient client = new SmtpClient("smtp.gmail.com");
 
-            client.Port = 587;
-            client.EnableSsl = true;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential(_settings.Key, _settings.Value);
+      client.Port = 587;
+      client.EnableSsl = true;
+      client.UseDefaultCredentials = false;
+      client.Credentials = new NetworkCredential(_settings.Key, _settings.Value);
 
-            MailMessage msg = new MailMessage();
-            msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
-            msg.To.Add(emailAddress);
-            msg.Subject = "Vuelo Email Verification";
-            var redirect = "https://localhost:5001/resetPassword";
-            msg.Body = string.Format("Please copy this to the verification field: {0} <br>" +
-                        "Click the <a href=\'{1}'> link </a> to verify password", token, redirect);
-            msg.IsBodyHtml = true;
+      MailMessage msg = new MailMessage();
+      msg.From = new MailAddress("jo3JO3jo31234@gmail.com");
+      msg.To.Add(emailAddress);
+      msg.Subject = "Vuelo Email Verification";
+      var redirect = "https://localhost:5001/resetPassword";
+      msg.Body = string.Format("Please copy this to the verification field: {0} <br>" +
+                  "Click the <a href=\'{1}'> link </a> to verify password", token, redirect);
+      msg.IsBodyHtml = true;
 
-            client.Send(msg);
+      client.Send(msg);
 
-            return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success); 
-        }
+      return new KeyValuePair<User, ErrorCode>(user, ErrorCode.Success);
+    }
 
-        public User ChangePassword(string password, string code)
-        {
-            EmailAuth emailAuth = _emailAuth.Find(x => x.Token.Equals(code)).FirstOrDefault();
-            User user = _users.Find(x => x.Email.Equals(emailAuth.UserEmail)).FirstOrDefault();
+    public User ChangePassword(string password, string code)
+    {
+      EmailAuth emailAuth = _emailAuth.Find(x => x.Token.Equals(code)).FirstOrDefault();
+      User user = _users.Find(x => x.Email.Equals(emailAuth.UserEmail)).FirstOrDefault();
 
-            if (user == null || emailAuth == null)
-                return null;
+      if (user == null || emailAuth == null)
+        return null;
 
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+      byte[] passwordHash, passwordSalt;
+      CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+      user.PasswordHash = passwordHash;
+      user.PasswordSalt = passwordSalt;
 
-            _users.ReplaceOne(temp => temp.Id == user.Id, user);
+      _users.ReplaceOne(temp => temp.Id == user.Id, user);
 
-            return user;
-        }
+      return user;
+    }
 
-        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {            
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("value cannot be empty or whitespace only.", "password");
+    private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+    {
+      if (password == null) throw new ArgumentNullException("password");
+      if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("value cannot be empty or whitespace only.", "password");
 
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
+      using (var hmac = new System.Security.Cryptography.HMACSHA512())
+      {
+        passwordSalt = hmac.Key;
+        passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+      }
+    }
 
-        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
-        {
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("value cannot be empty or whitespace only.", "password");
-            if (storedHash.Length != 64) throw new ArgumentException("Invalid password hash length (64 bytes expected)", "passwordHash");
-            if (storedSalt.Length != 128) throw new ArgumentException("Invalid password salt length (128 bytes expected)", "passwordHash");
+    private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+    {
+      if (password == null) throw new ArgumentNullException("password");
+      if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("value cannot be empty or whitespace only.", "password");
+      if (storedHash.Length != 64) throw new ArgumentException("Invalid password hash length (64 bytes expected)", "passwordHash");
+      if (storedSalt.Length != 128) throw new ArgumentException("Invalid password salt length (128 bytes expected)", "passwordHash");
 
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                for (int i = 0; i < computedHash.Length; i++)
-                    if (computedHash[i] != storedHash[i]) return false;
+      using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
+      {
+        var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        for (int i = 0; i < computedHash.Length; i++)
+          if (computedHash[i] != storedHash[i]) return false;
 
-                // password is verified, so return true
-                return true;
-            }
-        }
+        // password is verified, so return true
+        return true;
+      }
+    }
   }
 }

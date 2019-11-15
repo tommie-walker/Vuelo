@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Avatar, message } from 'antd';
 import Config from '../config/app.local.config';
-
 import Banner from '../NavHeader/banner';
 
 function ChangePassword(props) {
@@ -36,7 +35,7 @@ function ChangePassword(props) {
 
   return (
     <div className='mainContent smallContent'>
-
+      <Banner />
       <Card className="loginCard">
         <Avatar size={120} className="loginIcon" icon="user" />
         <h1 className="big-title">Change Password</h1>
