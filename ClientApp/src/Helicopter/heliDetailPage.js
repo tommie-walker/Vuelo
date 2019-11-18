@@ -1,44 +1,83 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Input, Button, Form, notification, List, Col, Row, message } from "antd";
 import { useParams, useHistory } from "react-router";
-import Config from "../config/app.local.config";
+import config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 import { UserContext } from "../contexts/UserContext";
 import { HelicopterContext } from '../contexts/HelicopterContext';
+import { isEmpty } from 'lodash';
 
 const HeliDetailPage = () => {
   let history = useHistory();
   const urlParams = useParams();
   const heliId = urlParams._id;
+
   const { helis } = useContext(HelicopterContext);
   const { user, updateUser } = useContext(UserContext);
 
-  const [heli, setHeli] = useState(helis.filter(h => heliId === h._id))
-
-  const [heliUrl] = useState(heli[0].url);
-  const [model, setModel] = useState(heli[0].model);
-  const [type, setType] = useState(heli[0].type);
-  const [capacityWeight, setCapacityWeight] = useState(heli[0].capacityWeight);
-  const [crewMax, setCrewMax] = useState(heli[0].crewMax);
-  const [crewMin, setCrewMin] = useState(heli[0].crewMin);
-  const [fuselageLength, setFuselageLength] = useState(heli[0].fuselageLength);
-  const [heliHeight, setHeliHeight] = useState(heli[0].height);
-  const [rotorDiam, setRotorDiameter] = useState(heli[0].rotorDiameter);
-  const [maxSpeed, setMaxSpeed] = useState(heli[0].maxSpeed);
-  const [_id] = useState(heli[0]._id);
-
-  const [favorite, setFavorite] = useState(user.favorites.includes(heli[0].model));
+  const [heliUrl, setHeliUrl] = useState('');
+  const [type, setType] = useState('');
+  const [model, setModel] = useState('');
+  const [capacityWeight, setCapacityWeight] = useState('');
+  const [crewMax, setCrewMax] = useState('');
+  const [crewMin, setCrewMin] = useState('');
+  const [fuselageLength, setFuselageLength] = useState('');
+  const [heliHeight, setHeliHeight] = useState('');
+  const [rotorDiam, setRotorDiameter] = useState('');
+  const [maxSpeed, setMaxSpeed] = useState('');
+  const [_id, setId] = useState('');
+  const heli = helis.filter(h => heliId === h._id);
 
   useEffect(() => {
-    if (!heli) handleRefresh();
+    if (!isEmpty(heli)) {
+      setHeliUrl(heli[0].url)
+      setModel(heli[0].model)
+      setType(heli[0].type)
+      setCapacityWeight(heli[0].capacityWeight)
+      setCrewMax(heli[0].crewMax)
+      setCrewMin(heli[0].crewMin)
+      setFuselageLength(heli[0].fuselageLength)
+      setHeliHeight(heli[0].height)
+      setRotorDiameter(heli[0].rotorDiameter)
+      setMaxSpeed(heli[0].maxSpeed)
+      setId(heli[0]._id)
+    } else {
+      handleRefresh();
+    }
   }, []);
 
+  const [favorite, setFavorite] = useState(user.favorites.includes(model));
+
+  function handleRefresh() {
+    if (favorite) return;
+    fetch(`${config.helicopterServiceUrl}getOne/${heliId}`)
+      .then(res => {
+        if (!res.ok) throw Error(res.statusText);
+        return res.json();
+      })
+      .then(h => {
+        setHeliUrl(h.url)
+        setModel(h.model)
+        setType(h.type)
+        setCapacityWeight(h.capacityWeight)
+        setCrewMax(h.crewMax)
+        setCrewMin(h.crewMin)
+        setFuselageLength(h.fuselageLength)
+        setHeliHeight(h.height)
+        setRotorDiameter(h.rotorDiameter)
+        setMaxSpeed(h.maxSpeed)
+        setId(h._id)
+      })
+      .catch((err) => {
+        message.error('Could not find your helicopter');
+      })
+  }
 
   function addFavorite() {
-    const userFav = { model, username: user.username }
     if (!user.username) history.push('/login');
     if (favorite) return
-    fetch(`${Config.userServiceUrl}AddUserFavorite`, {
+    const userFav = { model, username: user.username }
+    fetch(`${config.userServiceUrl}AddUserFavorite`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -56,24 +95,10 @@ const HeliDetailPage = () => {
       })
   };
 
-  function handleRefresh() {
-    if (!favorite) return;
-    fetch(`${Config.helicopterServiceUrl}GetOne/${heliId}`)
-      .then(res => {
-        if (!res.ok) throw Error(res.statusText);
-        return res.json();
-      })
-      .then(h => {
-        setHeli(h);
-      })
-      .catch((err) => {
-        message.error('Could not find your helicopter');
-      })
-  }
 
   function removeFavorite() {
     const userFav = { model, username: user.username }
-    fetch(`${Config.userServiceUrl}DeleteUserFavorite`, {
+    fetch(`${config.userServiceUrl}DeleteUserFavorite`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -90,7 +115,7 @@ const HeliDetailPage = () => {
   };
 
   function deleteHeli() {
-    fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
+    fetch(`${config.helicopterServiceUrl}${heli._id}`, {
       method: `DELETE`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -111,7 +136,7 @@ const HeliDetailPage = () => {
 
   function updateHelicopter() {
     const heli = { _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
-    fetch(`${Config.helicopterServiceUrl}${heli._id}`, {
+    fetch(`${config.helicopterServiceUrl}${heli._id}`, {
       method: `PATCH`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
