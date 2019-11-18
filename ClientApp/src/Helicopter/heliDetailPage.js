@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Input, Button, Form, notification, List, Col, Row, message } from "antd";
 import { useParams, useHistory } from "react-router";
 import Config from "../config/app.local.config";
@@ -13,9 +13,7 @@ const HeliDetailPage = () => {
   const { helis } = useContext(HelicopterContext);
   const { user, updateUser } = useContext(UserContext);
 
-  const heli = helis.filter(h =>
-    heliId === h._id
-  );
+  const [heli, setHeli] = useState(helis.filter(h => heliId === h._id))
 
   const [heliUrl] = useState(heli[0].url);
   const [model, setModel] = useState(heli[0].model);
@@ -30,6 +28,10 @@ const HeliDetailPage = () => {
   const [_id] = useState(heli[0]._id);
 
   const [favorite, setFavorite] = useState(user.favorites.includes(heli[0].model));
+
+  useEffect(() => {
+    if (!heli) handleRefresh();
+  }, []);
 
 
   function addFavorite() {
@@ -53,6 +55,21 @@ const HeliDetailPage = () => {
         message.error("Could not be added to favorites")
       })
   };
+
+  function handleRefresh() {
+    if (!favorite) return;
+    fetch(`${Config.helicopterServiceUrl}GetOne/${heliId}`)
+      .then(res => {
+        if (!res.ok) throw Error(res.statusText);
+        return res.json();
+      })
+      .then(h => {
+        setHeli(h);
+      })
+      .catch((err) => {
+        message.error('Could not find your helicopter');
+      })
+  }
 
   function removeFavorite() {
     const userFav = { model, username: user.username }
@@ -115,7 +132,7 @@ const HeliDetailPage = () => {
   function handleError(err) {
     notification["error"]({
       message: "Oh No! Something went wrong!",
-      description: `Sorry about that! It will be back up and running in a jiffy! We were unable to add your class to the list.${err}`
+      description: `Sorry about that! It will be back up and running in a jiffy!`
     });
   }
 
