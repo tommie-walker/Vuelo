@@ -12,4 +12,5 @@ public interface HelicopterRepository extends MongoRepository<Helicopter, String
     List<Helicopter> findAll();
    Helicopter insert(Helicopter helicopter);
    void delete(Helicopter helicopter);
+    Helicopter findBy_id(String id);
 }

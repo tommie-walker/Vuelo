@@ -32,6 +32,13 @@ public class HelicopterController {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(h);
     }
+    @RequestMapping("/api/helicopter/getOne/{_id}")
+    public  String getAllHelicopters(@PathVariable String _id) throws JsonProcessingException {
+        Helicopter h = helicopterRepository.findBy_id(_id);
+        //Output to front end
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(h);
+    }
 
     //delete an existing helicopter
     @DeleteMapping ("/api/helicopter/{_id}")
