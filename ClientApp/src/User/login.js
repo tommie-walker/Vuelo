@@ -45,7 +45,7 @@ function Login(props) {
         <Banner />
         <Card className="loginCard">
           <Avatar size={120} className="loginIcon" icon="user" />
-          <h1 className="big-title">Log In</h1>
+          <h1 className="big-title">Welcome Back!</h1>
           <Form
             onSubmit={e => {
               e.preventDefault();
@@ -72,7 +72,7 @@ function Login(props) {
               />
             </Form.Item>
             <Button type="primary" htmlType="submit" onClick={authenticateUser} className="loginButton" >
-              Sign In
+              Log In
             </Button>
             <div>
               <Link to="/forgotPassword">
@@ -80,7 +80,7 @@ function Login(props) {
               </Link>
               <Divider type="vertical" />
               <Link to="/signUp">
-                Not a member yet? Sign up!
+                Sign up
               </Link>
             </div>
           </Form>
