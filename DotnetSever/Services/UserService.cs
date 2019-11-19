@@ -52,44 +52,85 @@ namespace RSIVueloAPI.Services
       sidExpire = 30;
     }
 
-    public string GenerateJWT(UserDTO user)
-    {
-      var expiry = 60;
-      var claim = new[]
-      {
+        private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<EmailAuth> _emailAuth;
+        private readonly IMongoCollection<JWTToken> _jwt;
+        private readonly IMongoCollection<Session> _sid;
+        private KeyValuePair<string, string> _settings;
+        private JWTTokenManager _tokenManagement;
+        private int sidExpire;
+
+        public UserService(IUserDatabaseSettings settings)
+        {
+            var client = new MongoClient(settings.ConnectionString);
+            var db = client.GetDatabase(settings.DatabaseName);
+
+            _users = db.GetCollection<User>(settings.UserCollectionName);
+            _emailAuth = db.GetCollection<EmailAuth>(settings.EmailAuthCollectionName);
+            _jwt = db.GetCollection<JWTToken>(settings.JWTCollectionName);
+            _sid = db.GetCollection<Session>(settings.SessionCollectionName);
+
+            _settings = new KeyValuePair<string, string>(settings.EmailUser, settings.EmailPass);
+
+            _tokenManagement = new JWTTokenManager
+            {
+                Secret = settings.Secret,
+                Issuer = settings.Issuer,
+                Audience = settings.Auidence,
+                AccessExpiration = settings.AccessExpiration,
+                RefreshExpiration = settings.RefreshExpiration
+            };
+
+            sidExpire = 30;
+        }
+        public bool CheckLoginToken(string email, out string exist)
+        {
+            JWTToken jwt = _jwt.Find(x => x.UserEmail.Equals(email)).FirstOrDefault();
+
+            if (jwt == null)
+            {
+                exist = string.Empty;
+                return false;
+            }
+
+            exist = jwt.jwtToken;
+            return true; // token already exist
+        }
+
+        public string GenerateJWT(UserDTO user)
+        {
+            var expiry = 60;
+            var claim = new[]
+            {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Role, user.Role)
             };
-      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenManagement.Secret));
-      var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenManagement.Secret));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-      var jwtToken = new JwtSecurityToken(
-          _tokenManagement.Issuer,
-          _tokenManagement.Audience,
-          claim,
-          expires: DateTime.UtcNow.AddSeconds(expiry),
-          signingCredentials: credentials
-      );
+            var jwtToken = new JwtSecurityToken(
+                _tokenManagement.Issuer,
+                _tokenManagement.Audience,
+                claim,
+                expires: DateTime.UtcNow.AddSeconds(expiry),
+                signingCredentials: credentials
+            );
 
-      var TokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            var TokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
-      // create timestamp in db
-      var jwt = new JWTToken()
-      {
-        UserEmail = user.Email,
-        jwtToken = TokenString,
-        TimeStamp = DateTime.UtcNow,
-        Expire = DateTime.UtcNow.AddSeconds(expiry)
-      };
+            // create timestamp in db
+            var jwt = new JWTToken()
+            {
+                UserEmail = user.Email,
+                jwtToken = TokenString,
+                TimeStamp = DateTime.UtcNow,
+                Expire = DateTime.UtcNow.AddSeconds(expiry)
+            };
 
-      _jwt.InsertOne(jwt);
+            _jwt.InsertOne(jwt);
+            return TokenString;
+        }
 
-      // var builder = Builders<JWTToken>.IndexKeys;
-      // _jwt.Indexes.CreateOne(new CreateIndexModel<JWTToken>(builder.Ascending(x => x.Expire),
-      //                                                        new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
-
-      return TokenString;
-    }
 
     public void CreateDTO(User user, out UserDTO newDTO)
     {
@@ -118,28 +159,55 @@ namespace RSIVueloAPI.Services
       };
     }
 
-    public bool RefreshSession(string username, string code)
-    {
-      // check if session is valid
-      User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
-      if (user == null)
-        return false;
-
-      Session sid = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
-      if (sid == null)
-        return false;
-
-      if (sid.SessionId == code)
-      {
-        // user has correct session, so refresh 
-        Session update = new Session
+        public bool RefreshSession(string username, string sid, string jwt)
         {
-          Id = sid.Id,  // updating entry, so object id is required
-          UserEmail = sid.UserEmail,
-          SessionId = sid.SessionId,
-          TimeStamp = sid.Expire,
-          Expire = DateTime.UtcNow.AddSeconds(sidExpire)
-        };
+            // check if session is valid
+            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+            if (user == null)
+                return false;
+
+            Session session = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+            if (session == null)
+                return false;
+
+
+            // verify jwt and session
+            if (session.jwtToken == jwt && session.SessionId == sid)
+            {
+                // user has correct session, so refresh 
+                Session update = new Session
+                {
+                    Id = session.Id,  // updating entry, so object id is required
+                    UserEmail = session.UserEmail,
+                    SessionId = session.SessionId,
+                    jwtToken = jwt,
+                    TimeStamp = session.Expire,
+                    Expire = DateTime.UtcNow.AddSeconds(sidExpire)
+                };
+
+                _sid.ReplaceOne(temp => temp.UserEmail == update.UserEmail, update);
+                return true;
+            }
+            else // invalid credentials
+                return false;
+        }
+
+        public bool SaveSession(UserDTO user, string value, string jwt)
+        {
+            if (user == null)
+                return false;
+            var sid = new Session()
+            {
+                UserEmail = user.Email,
+                SessionId = value,
+                jwtToken = jwt,
+                TimeStamp = DateTime.UtcNow,
+                Expire = DateTime.UtcNow.AddSeconds(sidExpire)
+            };
+
+            _sid.InsertOne(sid);
+            return true;
+        }
 
         _sid.ReplaceOne(temp => temp.UserEmail == update.UserEmail, update);
         return true;
@@ -196,37 +264,79 @@ namespace RSIVueloAPI.Services
       return newUser;
     }
 
-    public void Update(string id, User userIn, string password = null)
-    {
-      userIn.Role = "user";
-      userIn.Id = id;
+        public void Update(string id, User userIn, string password = null)
+        {
+            userIn.Role = "user";
+            userIn.Id = id;
 
-      if (userIn == null) throw new ApplicationException("User not found");
+            if (userIn == null) throw new ApplicationException("User not found");
 
-      if (!string.IsNullOrWhiteSpace(password))
-      {
-        byte[] passwordHash, passwordSalt;
-        CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-        userIn.PasswordHash = passwordHash;
-        userIn.PasswordSalt = passwordSalt;
-      }
+                userIn.PasswordHash = passwordHash;
+                userIn.PasswordSalt = passwordSalt;
+            }
 
-      _users.ReplaceOne(user => user.Id == id, userIn);
+            _users.ReplaceOne(user => user.Id == id, userIn);
+        }
+        public bool AddHeliFavorite(string newEntry, string username, string sid, string jwt)
+        {
+            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+            if (user == null)
+                return false;
+
+            // verify session and token
+            Session session = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+            if (session.SessionId == sid && session.jwtToken == jwt)
+            {
+                // update db entries to reflect current time stamp
+                Session update = new Session
+                {
+                    Id = session.Id,  // updating entry, so object id is required
+                    UserEmail = session.UserEmail,
+                    SessionId = session.SessionId,
+                    jwtToken = jwt,
+                    TimeStamp = session.Expire,
+                    Expire = DateTime.UtcNow.AddSeconds(sidExpire)
+                };
+
+                _sid.ReplaceOne(temp => temp.UserEmail == update.UserEmail, update);
+            }
+                
+
+            user.favorites.Add(new string(newEntry));
+            _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
     }
 
-    public void Remove(User userIn) =>
-        _users.DeleteOne(user => user.Id == userIn.Id);
+        public bool DeleteHeliFavorite(string entry, string username, string sid, string jwt)
+        {
+            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+            if (user == null)
+                return false;
 
-    public void Remove(string id) =>
-        _users.DeleteOne(user => user.Id == id);
+            // verify session and token
+            Session session = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+            if (session.SessionId == sid && session.jwtToken == jwt)
+            {
+                // update db entries to reflect current time stamp
+                Session update = new Session
+                {
+                    Id = session.Id,  // updating entry, so object id is required
+                    UserEmail = session.UserEmail,
+                    SessionId = session.SessionId,
+                    jwtToken = jwt,
+                    TimeStamp = session.Expire,
+                    Expire = DateTime.UtcNow.AddSeconds(sidExpire)
+                };
 
-    public bool AddHeliFavorite(string newEntry, string username)
-    {
-      User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+                _sid.ReplaceOne(temp => temp.UserEmail == update.UserEmail, update);
+            }
 
-      if (user == null)
-        return false;
+            if (!user.favorites.Remove(entry))
+                return false;
 
       user.favorites.Add(new string(newEntry));
       _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
@@ -237,9 +347,16 @@ namespace RSIVueloAPI.Services
     public bool DeleteHeliFavorite(string entry, string username)
     {
       User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
-
       if (user == null)
         return false;
+
+            Session sid = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+            if (sid == null)
+                return null;
+
+            // delete from db
+            _sid.DeleteOne(temp => temp.UserEmail == sid.UserEmail);
+
 
       if (!user.favorites.Remove(entry))
         return false;

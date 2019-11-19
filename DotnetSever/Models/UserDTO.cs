@@ -23,8 +23,11 @@ namespace RSIVueloAPI.Models
     [JsonProperty("role")]
     public string Role { get; set; }
 
-    [JsonProperty("code")]
-    public string Code { get; set; }
+    [JsonProperty("session")]
+    public string session { get; set; }
+
+    [JsonProperty("token")]
+    public string token { get; set; }
 
     [JsonProperty("model")]
     public string heliModel { get; set; }
