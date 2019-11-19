@@ -16,26 +16,29 @@ import EmailPrompt from './User/emailPrompt';
 import UserProfile from './User/userProfile';
 import UserContextProvider from "./contexts/UserContext";
 import HelicopterContextProvider from "./contexts/HelicopterContext";
+import TimerContextProvider from "./contexts/TimerContext";
 
 function App() {
 
   return (
-    <HelicopterContextProvider >
-      <UserContextProvider>
-        <Router>
-          <Layout className="layout">
-            <Route path='/users/:username' exact render={() => <UserProfile />} />
-            <Route path="/" exact render={() => <Helicopter />} />
-            <PrivateRoute path="/addHeli" exact component={AddHeli} />
-            <Route path={`/heliDetailPage/:_id`} exact render={() => <HeliDetailPage />} />
-            <Route path={`/forgotPassword`} exact render={() => <EmailPrompt />} />
-            <Route path='/resetPassword' exact render={() => <ChangePassword />} />
-            <Route path="/login" exact render={() => <Login />} />
-            <Route path="/signUp" exact render={() => <SignUp />} />
-          </Layout>
-        </Router>
-      </UserContextProvider>
-    </HelicopterContextProvider>
+    <UserContextProvider>
+      <TimerContextProvider >
+        <HelicopterContextProvider >
+          <Router>
+            <Layout className="layout">
+              <Route path='/users/:username' exact render={() => <UserProfile />} />
+              <Route path="/" exact render={() => <Helicopter />} />
+              <PrivateRoute path="/addHeli" exact component={AddHeli} />
+              <Route path={`/heliDetailPage/:_id`} exact render={() => <HeliDetailPage />} />
+              <Route path={`/forgotPassword`} exact render={() => <EmailPrompt />} />
+              <Route path='/resetPassword' exact render={() => <ChangePassword />} />
+              <Route path="/login" exact render={() => <Login />} />
+              <Route path="/signUp" exact render={() => <SignUp />} />
+            </Layout>
+          </Router>
+        </HelicopterContextProvider>
+      </TimerContextProvider>
+    </UserContextProvider>
   );
 }
 
