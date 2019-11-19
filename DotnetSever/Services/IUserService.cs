@@ -18,8 +18,6 @@ namespace RSIVueloAPI.Services
         User Get(string id);
         User Create(UserDTO user);
         void Update(string id, User userIn, string password);
-        void Remove(User userIn);
-        void Remove(string id);
         bool AddHeliFavorite(string newEntry, string username, string sid, string jwt);
 
         bool DeleteHeliFavorite(string entry, string username, string sid, string jwt);

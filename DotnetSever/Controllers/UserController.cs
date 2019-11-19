@@ -92,16 +92,6 @@ namespace RSIVueloAPI.Controllers
             return Ok(userIn);
         }
 
-        [HttpDelete("{id:length(24)}")]
-        public IActionResult DeleteUser(string id)
-        {
-            var user = _userService.Get(id);
-            if (user == null)
-                return StatusCode(StatusCodes.Status404NotFound);
-            _userService.Remove(user.Id);
-            return Ok(user);
-        }
-
         [HttpPut("[action]")]
         public IActionResult AddUserFavorite([FromBody]UserDTO dto)
         {
