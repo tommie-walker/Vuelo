@@ -47,6 +47,16 @@ namespace RSIVueloAPI.Controllers
             });
         }
 
+        [HttpPost("[action]")]
+        public IActionResult GetSession([FromBody]UserDTO dto)
+        {
+            var isValid = _userService.RefreshSession(dto.UserName, dto.Code);
+            if (!isValid)
+                return StatusCode(StatusCodes.Status404NotFound);
+
+            return Ok();
+        }
+
         [HttpGet("[action]")]
         public ActionResult<List<User>> GetAllUsers() =>
             _userService.Get();
