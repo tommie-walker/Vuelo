@@ -32,7 +32,7 @@ namespace RSIVueloAPI.Controllers
             _userService.AssignSessionProperties(out string key, out string random, out CookieOptions options);
             Response.Cookies.Append(key, random, options);
 
-            var isSaved = _userService.SaveSession(newDTO, random);
+            var isSaved = _userService.SaveSession(newDTO, random, jwt);
             if (!isSaved)
                 return StatusCode(StatusCodes.Status404NotFound);
 
@@ -50,7 +50,7 @@ namespace RSIVueloAPI.Controllers
         [HttpPost("[action]")]
         public IActionResult GetSession([FromBody]UserDTO dto)
         {
-            var isValid = _userService.RefreshSession(dto.UserName, dto.Code);
+            var isValid = _userService.RefreshSession(dto.UserName, dto.session);
             if (!isValid)
                 return StatusCode(StatusCodes.Status404NotFound);
 
@@ -129,7 +129,7 @@ namespace RSIVueloAPI.Controllers
         [HttpPut("[action]")]
         public IActionResult UpdatePassword([FromBody]UserDTO dto)
         {
-            var newUser = _userService.ChangePassword(dto.Password, dto.Code);
+            var newUser = _userService.ChangePassword(dto.Password, dto.session);
             if (newUser == null)
                 return StatusCode(StatusCodes.Status404NotFound);
             return Ok(newUser);

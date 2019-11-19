@@ -9,7 +9,7 @@ namespace RSIVueloAPI.Services
     public interface IUserService
     {
         string GenerateJWT(UserDTO user);
-        bool SaveSession(UserDTO user, string value);
+        bool SaveSession(UserDTO user, string value, string jwt);
         void CreateDTO(User user, out UserDTO newDTO);
         void AssignSessionProperties(out string key, out string random, out CookieOptions options);
         bool RefreshSession(string username, string code);

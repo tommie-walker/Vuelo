@@ -83,11 +83,6 @@ namespace RSIVueloAPI.Services
             };
 
             _jwt.InsertOne(jwt);
-
-            var builder = Builders<JWTToken>.IndexKeys;
-            _jwt.Indexes.CreateOne(new CreateIndexModel<JWTToken>(builder.Ascending(x => x.Expire),
-                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
-
             return TokenString;
         }
 
@@ -149,7 +144,7 @@ namespace RSIVueloAPI.Services
             return false;
         }
 
-        public bool SaveSession(UserDTO user, string value)
+        public bool SaveSession(UserDTO user, string value, string jwt)
         {
             if (user == null)
                 return false;
@@ -157,6 +152,7 @@ namespace RSIVueloAPI.Services
             {
                 UserEmail = user.Email,
                 SessionId = value,
+                jwtToken = jwt,
                 TimeStamp = DateTime.UtcNow,
                 Expire = DateTime.UtcNow.AddSeconds(sidExpire)
             };
