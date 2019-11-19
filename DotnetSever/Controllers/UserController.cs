@@ -26,8 +26,11 @@ namespace RSIVueloAPI.Controllers
             if (user == null)
                 return StatusCode(StatusCodes.Status404NotFound);
 
+            var checkJWT = _userService.CheckLoginToken(user.Email, out string jwt);
             _userService.CreateDTO(user, out UserDTO newDTO);
-            var jwt = _userService.GenerateJWT(newDTO);
+
+            if (!checkJWT) // generate jwt if user does not have one
+                jwt = _userService.GenerateJWT(newDTO);
 
             _userService.AssignSessionProperties(out string key, out string random, out CookieOptions options);
             Response.Cookies.Append(key, random, options);
@@ -50,7 +53,7 @@ namespace RSIVueloAPI.Controllers
         [HttpPost("[action]")]
         public IActionResult GetSession([FromBody]UserDTO dto)
         {
-            var isValid = _userService.RefreshSession(dto.UserName, dto.session);
+            var isValid = _userService.RefreshSession(dto.UserName, dto.session, dto.token);
             if (!isValid)
                 return StatusCode(StatusCodes.Status404NotFound);
 
@@ -102,7 +105,7 @@ namespace RSIVueloAPI.Controllers
         [HttpPut("[action]")]
         public IActionResult AddUserFavorite([FromBody]UserDTO dto)
         {
-            var isSaved = _userService.AddHeliFavorite(dto.heliModel, dto.UserName);
+            var isSaved = _userService.AddHeliFavorite(dto.heliModel, dto.UserName, dto.session, dto.token);
             if (!isSaved)
                 return StatusCode(StatusCodes.Status404NotFound, isSaved);
             return Ok(isSaved);
@@ -111,7 +114,7 @@ namespace RSIVueloAPI.Controllers
         [HttpPut("[action]")]
         public IActionResult DeleteUserFavorite([FromBody]UserDTO dto)
         {
-            var isSaved = _userService.DeleteHeliFavorite(dto.heliModel, dto.UserName);
+            var isSaved = _userService.DeleteHeliFavorite(dto.heliModel, dto.UserName, dto.session, dto.token);
             if (!isSaved)
                 return StatusCode(StatusCodes.Status404NotFound);
             return Ok(isSaved);
