@@ -33,6 +33,7 @@ function Login(props) {
       })
       .catch(err => {
         if (username && password) {
+          updateUser({});
           message.error("Invalid Credentials");
           setPassword('');
         }

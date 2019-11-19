@@ -3,17 +3,21 @@ import React, { createContext, useContext } from 'react';
 import config from '../config/app.local.config';
 import { useHistory } from "react-router-dom";
 import { UserContext } from './UserContext';
+import { isEmpty } from 'lodash';
 
 export const TimerContext = createContext();
 
 const TimerContextProvider = props => {
   let history = useHistory();
   const { user, updateUser } = useContext(UserContext);
+  const username = user.username;
   const jwt = user.token;
-  const session = user.session;
+  const sessionCookie = document.cookie;
+  const session = sessionCookie.split("=")[1];
 
   function authenticateSession() {
-    const userAuth = { session, jwt }
+    if (isEmpty(jwt) || isEmpty(session) || isEmpty(username)) return
+    const userAuth = { session, jwt, username }
     fetch(`${config.userServiceUrl}GetSession`, {
       method: "POST",
       headers: {
@@ -34,7 +38,7 @@ const TimerContextProvider = props => {
   }
 
   const startSessionTimer = () => {
-    setInterval(() => authenticateSession, 10000);
+    setInterval(() => { authenticateSession(); }, 15000);
   }
 
   return (

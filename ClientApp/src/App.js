@@ -21,10 +21,10 @@ import TimerContextProvider from "./contexts/TimerContext";
 function App() {
 
   return (
-    <UserContextProvider>
-      <TimerContextProvider >
-        <HelicopterContextProvider >
-          <Router>
+    <Router>
+      <UserContextProvider>
+        <TimerContextProvider >
+          <HelicopterContextProvider >
             <Layout className="layout">
               <Route path='/users/:username' exact render={() => <UserProfile />} />
               <Route path="/" exact render={() => <Helicopter />} />
@@ -35,10 +35,10 @@ function App() {
               <Route path="/login" exact render={() => <Login />} />
               <Route path="/signUp" exact render={() => <SignUp />} />
             </Layout>
-          </Router>
-        </HelicopterContextProvider>
-      </TimerContextProvider>
-    </UserContextProvider>
+          </HelicopterContextProvider>
+        </TimerContextProvider>
+      </UserContextProvider>
+    </Router>
   );
 }
 
