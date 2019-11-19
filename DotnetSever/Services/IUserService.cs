@@ -12,6 +12,7 @@ namespace RSIVueloAPI.Services
         bool SaveSession(UserDTO user, string value);
         void CreateDTO(User user, out UserDTO newDTO);
         void AssignSessionProperties(out string key, out string random, out CookieOptions options);
+        bool RefreshSession(string username, string code);
         List<User> Get();
         User Get(string id);
         User Create(UserDTO user);

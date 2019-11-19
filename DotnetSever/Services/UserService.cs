@@ -26,6 +26,7 @@ namespace RSIVueloAPI.Services
         private readonly IMongoCollection<Session> _sid;
         private KeyValuePair<string, string> _settings;
         private JWTTokenManager _tokenManagement;
+        private int sidExpire;
 
         public UserService(IUserDatabaseSettings settings)
         {
@@ -47,6 +48,8 @@ namespace RSIVueloAPI.Services
                 AccessExpiration = settings.AccessExpiration,
                 RefreshExpiration = settings.RefreshExpiration
             };
+
+            sidExpire = 30;
         }
 
         public string GenerateJWT(UserDTO user)
@@ -115,25 +118,50 @@ namespace RSIVueloAPI.Services
             };
         }
 
+        public bool RefreshSession(string username, string code)
+        {
+            // check if session is valid
+            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
+            if (user == null)
+                return false;
+
+            Session sid = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
+            if (sid == null)
+                return false;
+
+            if (sid.SessionId == code)
+            {
+                // user has correct session, so refresh 
+                Session update = new Session
+                {
+                    Id = sid.Id,  // updating entry, so object id is required
+                    UserEmail = sid.UserEmail,
+                    SessionId = sid.SessionId,
+                    TimeStamp = sid.Expire,
+                    Expire = DateTime.UtcNow.AddSeconds(sidExpire)
+                };
+
+                _sid.ReplaceOne(temp => temp.UserEmail == update.UserEmail, update);
+                return true;
+            }
+                
+
+            return false;
+        }
+
         public bool SaveSession(UserDTO user, string value)
         {
             if (user == null)
                 return false;
-            var expiry = 60;
             var sid = new Session()
             {
                 UserEmail = user.Email,
                 SessionId = value,
                 TimeStamp = DateTime.UtcNow,
-                Expire = DateTime.UtcNow.AddSeconds(expiry)
+                Expire = DateTime.UtcNow.AddSeconds(sidExpire)
             };
 
             _sid.InsertOne(sid);
-
-            var builder = Builders<Session>.IndexKeys;
-            _sid.Indexes.CreateOne(new CreateIndexModel<Session>(builder.Ascending(x => x.Expire),
-                                                                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
-
             return true;
         }
 
@@ -265,10 +293,6 @@ namespace RSIVueloAPI.Services
                 Expire = DateTime.UtcNow.AddSeconds(expiry)
             };
             _emailAuth.InsertOne(emailAuth);
-
-            var builder = Builders<EmailAuth>.IndexKeys;
-            _emailAuth.Indexes.CreateOne(new CreateIndexModel<EmailAuth>(builder.Ascending(x => x.Expire),
-                                                                   new CreateIndexOptions { ExpireAfter = TimeSpan.FromSeconds(expiry) }));
 
             SmtpClient client = new SmtpClient("smtp.gmail.com");
 
