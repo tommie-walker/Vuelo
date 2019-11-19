@@ -26,7 +26,7 @@ namespace RSIVueloAPI.Models
     [JsonProperty("session")]
     public string session { get; set; }
 
-    [JsonProperty("token")]
+    [JsonProperty("jwt")]
     public string token { get; set; }
 
     [JsonProperty("model")]
