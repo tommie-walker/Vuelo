@@ -75,7 +75,10 @@ function Helicopter() {
 
   function handleType(type) {
     const helisOfOneType = helicopters.filter(h => h.type === type);
-    if (type === "All") setFiltHeli(helicopters)
+    if (type === "All") {
+      setTypeSelected("All");
+      setFiltHeli(helicopters)
+    }
     else {
       setTypeSelected(type)
       setFiltHeli(helisOfOneType);
