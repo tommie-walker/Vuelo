@@ -6,6 +6,7 @@ import HelicopterList from "./helicopter-list";
 import Config from '../config/app.local.config';
 import Banner from "../NavHeader/banner";
 import { HelicopterContext } from '../contexts/HelicopterContext';
+import { TimerContext } from "../contexts/TimerContext";
 
 function Helicopter() {
   const { Search } = Input;
@@ -21,6 +22,14 @@ function Helicopter() {
   const [heliHeight, setHeliHeight] = useState(1);
   const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
+
+  const { startSessionTimer } = useContext(TimerContext);
+  // let iasdf = 0;
+
+  useEffect(() => {
+    startSessionTimer();
+    // console.log(iasdf++);
+  }, [])
 
   function loadData() {
     fetch(`${Config.helicopterServiceUrl}`)

@@ -28,11 +28,12 @@ function Login(props) {
         return res.json();
       })
       .then(userData => {
-        updateUser({ username: userData.username, role: userData.role, favorites: userData.favorites, token: userData.token });
+        updateUser({ username: userData.username, role: userData.role, favorites: userData.favorites, token: userData.token, session: userData.session });
         history.push('/');
       })
       .catch(err => {
         if (username && password) {
+          updateUser({});
           message.error("Invalid Credentials");
           setPassword('');
         }
