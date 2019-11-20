@@ -26,30 +26,17 @@ const HeliDetailPage = () => {
   const [rotorDiam, setRotorDiameter] = useState('');
   const [maxSpeed, setMaxSpeed] = useState('');
   const [_id, setId] = useState('');
+  const [favorite, setFavorite] = useState();
   const heli = helis.filter(h => heliId === h._id);
 
   useEffect(() => {
-    if (!isEmpty(heli)) {
-      setHeliUrl(heli[0].url)
-      setModel(heli[0].model)
-      setType(heli[0].type)
-      setCapacityWeight(heli[0].capacityWeight)
-      setCrewMax(heli[0].crewMax)
-      setCrewMin(heli[0].crewMin)
-      setFuselageLength(heli[0].fuselageLength)
-      setHeliHeight(heli[0].height)
-      setRotorDiameter(heli[0].rotorDiameter)
-      setMaxSpeed(heli[0].maxSpeed)
-      setId(heli[0]._id)
-    } else {
-      handleRefresh();
-    }
+    console.log(user);
+    getHelicopter();
   }, []);
 
-  const [favorite, setFavorite] = useState(user.favorites.includes(model));
 
-  function handleRefresh() {
-    if (favorite) return;
+
+  function getHelicopter() {
     fetch(`${config.helicopterServiceUrl}getOne/${heliId}`)
       .then(res => {
         if (!res.ok) throw Error(res.statusText);
@@ -67,6 +54,7 @@ const HeliDetailPage = () => {
         setRotorDiameter(h.rotorDiameter)
         setMaxSpeed(h.maxSpeed)
         setId(h._id)
+        setFavorite(user.favorites.includes(h.model))
       })
       .catch((err) => {
         message.error('Could not find your helicopter');
@@ -98,6 +86,8 @@ const HeliDetailPage = () => {
 
   function removeFavorite() {
     const userFav = { model, username: user.username }
+    const removedFavoriteArray = user.favorites.filter(m => !model === m);
+    console.log(user.favorites.filter(m => model !== m))
     fetch(`${config.userServiceUrl}DeleteUserFavorite`, {
       method: 'PUT',
       headers: {
@@ -108,6 +98,7 @@ const HeliDetailPage = () => {
     }).then(res => {
       if (!res.ok) throw Error(res.statusText);
       setFavorite(false);
+      updateUser({ ...user, favorites: removedFavoriteArray })
     })
       .catch(() => {
         message.error("Could not be removed from favorites")

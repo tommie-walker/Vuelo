@@ -10,7 +10,7 @@ import { TimerContext } from "../contexts/TimerContext";
 
 function Helicopter() {
   const { Search } = Input;
-  const { helis, updateHelis } = useContext(HelicopterContext);
+  const { updateHelis } = useContext(HelicopterContext);
   const [helicopters, setHelicopters] = useState([])
   const [filtHeli, setFiltHeli] = useState(helicopters);
   const [typeSelected, setTypeSelected] = useState("All");
@@ -24,11 +24,9 @@ function Helicopter() {
   const [maxSpeed, setMaxSpeed] = useState(1);
 
   const { startSessionTimer } = useContext(TimerContext);
-  // let iasdf = 0;
 
   useEffect(() => {
     startSessionTimer();
-    // console.log(iasdf++);
   }, [])
 
   function loadData() {
