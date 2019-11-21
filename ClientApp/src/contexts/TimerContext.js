@@ -16,27 +16,27 @@ const TimerContextProvider = props => {
   const session = sessionCookie.split("=")[1];
 
   function authenticateSession() {
-    // if (isEmpty(jwt) || isEmpty(session) || isEmpty(username)) return
-    // const userAuth = { session, jwt, username }
-    // fetch(`${config.userServiceUrl}GetSession`, {
-    //   method: "POST",
-    //   headers: {
-    //     'Content-Type': 'application/json;charset=UTF-8',
-    //     'Accept': 'application/json'
-    //   },
-    //   accepts: 'application/json',
-    //   body: JSON.stringify(userAuth)
-    // })
-    //   .then(res => {
-    //     console.log(res.ok);
-    //     if (!res.ok) throw new Error(res.status);
-    //     console.log('Valid Session ID')
-    //   })
-    //   .catch(err => {
-    //     message.error('invalid session');
-    //     // updateUser({});
-    //     // history.push('/login');
-    //   });
+    if (isEmpty(jwt) || isEmpty(session) || isEmpty(username)) return
+    const userAuth = { session, jwt, username }
+    fetch(`${config.userServiceUrl}GetSession`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json'
+      },
+      accepts: 'application/json',
+      body: JSON.stringify(userAuth)
+    })
+      .then(res => {
+        console.log(res.ok);
+        if (!res.ok) throw new Error(res.status);
+        console.log('Valid Session ID')
+      })
+      .catch(err => {
+        message.error('invalid session');
+        // updateUser({});
+        // history.push('/login');
+      });
   }
 
   const startSessionTimer = () => {

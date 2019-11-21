@@ -85,7 +85,7 @@ const HeliDetailPage = () => {
 
 
   function removeFavorite() {
-    const userFav = { model, username: user.username }
+    const userFav = { model, username: user.username, SessionId:  }
     const removedFavoriteArray = user.favorites.filter(m => !model === m);
     console.log(user.favorites.filter(m => model !== m))
     fetch(`${config.userServiceUrl}DeleteUserFavorite`, {
