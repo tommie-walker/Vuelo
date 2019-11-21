@@ -5,6 +5,7 @@ import config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 import { UserContext } from "../contexts/UserContext";
 import { HelicopterContext } from '../contexts/HelicopterContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { isEmpty } from 'lodash';
 
 const HeliDetailPage = () => {
@@ -12,6 +13,7 @@ const HeliDetailPage = () => {
   const urlParams = useParams();
   const heliId = urlParams._id;
 
+  const { authenticate } = useContext(AuthContext);
   const { helis } = useContext(HelicopterContext);
   const { user, updateUser } = useContext(UserContext);
 
@@ -85,7 +87,7 @@ const HeliDetailPage = () => {
 
 
   function removeFavorite() {
-    const userFav = { model, username: user.username, SessionId:  }
+    const userFav = { model, username: user.username }
     const removedFavoriteArray = user.favorites.filter(m => !model === m);
     console.log(user.favorites.filter(m => model !== m))
     fetch(`${config.userServiceUrl}DeleteUserFavorite`, {
@@ -126,7 +128,7 @@ const HeliDetailPage = () => {
   }
 
   function updateHelicopter() {
-    const heli = { _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
+    const heli = { heliId: _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
     fetch(`${config.helicopterServiceUrl}${heli._id}`, {
       method: `PATCH`,
       headers: {

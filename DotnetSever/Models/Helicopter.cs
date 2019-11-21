@@ -1,34 +1,15 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-
 namespace RSIVueloAPI.Models
 {
-  public class UserDTO
+  public class Helicopter
   {
+    public Helicopter()
+    {
+
+    }
+
     [JsonProperty("_id")]
-    public string Id { get; set; }
-    [JsonProperty("username")]
-    public string UserName { get; set; }
-
-    [JsonProperty("password")]
-    public string Password { get; set; }
-
-    [JsonProperty("email")]
-    public string Email { get; set; }
-
-    [JsonProperty("favorites")]
-    public List<string> favorites { get; set; }
-
-    [JsonProperty("role")]
-    public string Role { get; set; }
-
-    [JsonProperty("session")]
-    public string session { get; set; }
-
-    [JsonProperty("jwt")]
-    public string token { get; set; }
-
-    [JsonProperty("heliId")]
     public string heliId { get; set; }
 
     [JsonProperty("model")]
@@ -60,4 +41,5 @@ namespace RSIVueloAPI.Models
     [JsonProperty("maxSpeed")]
     public string heliMaxSpeed { get; set; }
   }
+
 }

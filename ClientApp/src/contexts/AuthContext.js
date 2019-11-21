@@ -5,19 +5,17 @@ import { UserContext } from './UserContext';
 import { isEmpty } from 'lodash';
 import { message } from 'antd';
 
-export const TimerContext = createContext();
+export const AuthContext = createContext();
 
-const TimerContextProvider = props => {
+const AuthContextProvider = props => {
   let history = useHistory();
   const { user, updateUser } = useContext(UserContext);
   const username = user.username;
   const jwt = user.token;
-  const sessionCookie = document.cookie;
-  const session = sessionCookie.split("=")[1];
 
   function authenticateSession() {
-    if (isEmpty(jwt) || isEmpty(session) || isEmpty(username)) return
-    const userAuth = { session, jwt, username }
+    if (isEmpty(jwt) || isEmpty(username)) return
+    const userAuth = { jwt, username }
     fetch(`${config.userServiceUrl}GetSession`, {
       method: "POST",
       headers: {
@@ -28,26 +26,25 @@ const TimerContextProvider = props => {
       body: JSON.stringify(userAuth)
     })
       .then(res => {
-        console.log(res.ok);
         if (!res.ok) throw new Error(res.status);
-        console.log('Valid Session ID')
+        console.log('Valid Session ID');
       })
       .catch(err => {
         message.error('invalid session');
-        // updateUser({});
-        // history.push('/login');
+        updateUser({});
+        history.push('/login');
       });
   }
 
-  const startSessionTimer = () => {
-    setInterval(() => { authenticateSession(); }, 15000);
+  const authenticate = () => {
+    authenticateSession();
   }
 
   return (
-    <TimerContext.Provider value={{ startSessionTimer }}>
+    <AuthContext.Provider value={{ authenticate }}>
       {props.children}
-    </TimerContext.Provider>
+    </AuthContext.Provider>
   );
 }
 
-export default TimerContextProvider;
+export default AuthContextProvider;
