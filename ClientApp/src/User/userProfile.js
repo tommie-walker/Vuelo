@@ -8,12 +8,10 @@ import { UserContext } from '../contexts/UserContext';
 
 function UserProfile() {
   const { user } = useContext(UserContext);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState();
 
   useEffect(() => {
-    if (isEmpty(favorites)) {
-      loadFavorites();
-    }
+    loadFavorites();
   }, []);
 
   function loadFavorites() {

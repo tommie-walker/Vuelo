@@ -7,13 +7,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.Objects;
+
 @Document(collection = "Helicopters")
-@Builder
-@Setter
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@Setter
 @ToString
+@AllArgsConstructor
+@Builder
 public class Helicopter {
     String _id;
     String type;
@@ -27,4 +28,5 @@ public class Helicopter {
     String rotorDiameter;
     String maxSpeed;
     String url;
+
 }

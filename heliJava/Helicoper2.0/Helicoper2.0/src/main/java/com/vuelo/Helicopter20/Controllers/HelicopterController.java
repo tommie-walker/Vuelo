@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+//---------------------------------------------
+//todo: for every helicopter interaction, call the newSession(String email) function.
+
+//===============================================
+
 @CrossOrigin
 @RestController
 public class HelicopterController {

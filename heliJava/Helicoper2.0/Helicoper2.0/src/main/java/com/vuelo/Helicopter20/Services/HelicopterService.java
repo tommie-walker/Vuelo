@@ -1,17 +1,24 @@
 package com.vuelo.Helicopter20.Services;
 
 import com.vuelo.Helicopter20.Entities.Helicopter;
+import com.vuelo.Helicopter20.Entities.Session;
 import com.vuelo.Helicopter20.Entities.User;
 import com.vuelo.Helicopter20.Repositories.HelicopterRepository;
+import com.vuelo.Helicopter20.Repositories.SessionRepository;
 import com.vuelo.Helicopter20.Repositories.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@AllArgsConstructor
+@NoArgsConstructor
 public class HelicopterService {
 
     @Autowired
@@ -20,6 +27,18 @@ public class HelicopterService {
     @Autowired
     private HelicopterRepository helicopterRepository;
 
+    @Autowired
+    private SessionRepository sessionRepository;
+
+    //todo: find users username and grab email. After create new instance in the session table with that users email
+    public void newSession(String username){
+        User user = userRepository.findByUsername(username);
+        String email = user.getEmail();
+        Session session = sessionRepository.findByUserEmail(email);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND,30);
+        session.setExpire((DateTimeFormat) calendar.getTime());
+    }
 
     //find user then create list of their favorite helicopter
     public List<Helicopter> getFavoritesByUserUsername(String username){
@@ -31,11 +50,10 @@ public class HelicopterService {
         return helicopters;
     }
 
-//update helicopter fields/info
     public Helicopter updateHelicopter(String id, Helicopter heli){
-        Optional<Helicopter> h = Optional.of(helicopterRepository.findById(id).get());
-        if(h.isPresent()){
-            Helicopter update = helicopterRepository.findById(id).get();
+        Helicopter h = helicopterRepository.findBy_id(id);
+        if(h != null){
+            Helicopter update = helicopterRepository.findBy_id(id);
             update.setModel(heli.getModel());
             update.setType(heli.getType());
             update.setCapacityWeight(heli.getCapacityWeight());
@@ -48,6 +66,7 @@ public class HelicopterService {
             helicopterRepository.save(update);
             return update;
         }else{
+            heli = helicopterRepository.save(heli);
             return heli;
         }
     }
