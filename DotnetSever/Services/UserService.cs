@@ -279,7 +279,9 @@ namespace RSIVueloAPI.Services
 
             // verify session and token
             Session session = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
-            if (session.SessionId == sid && session.jwtToken == jwt)
+            if (session == null)
+                return false;
+            else if (session.SessionId == sid && session.jwtToken == jwt)
             {
                 // update db entries to reflect current time stamp
                 Session update = new Session
@@ -294,6 +296,8 @@ namespace RSIVueloAPI.Services
 
                 _sid.ReplaceOne(temp => temp.UserEmail == update.UserEmail, update);
             }
+            else
+                return false;
 
             if (!user.favorites.Remove(entry))
                 return false;
@@ -301,27 +305,6 @@ namespace RSIVueloAPI.Services
             user.favorites.Add(new string(entry));
             _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
 
-            return true;
-        }
-
-        public bool DeleteHeliFavorite(string entry, string username)
-        {
-            User user = _users.Find(x => x.UserName.Equals(username)).FirstOrDefault();
-            if (user == null)
-                return false;
-
-            Session sid = _sid.Find(x => x.UserEmail.Equals(user.Email)).FirstOrDefault();
-            if (sid == null)
-                return false;
-
-            // delete from db
-            _sid.DeleteOne(temp => temp.UserEmail == sid.UserEmail);
-
-
-            if (!user.favorites.Remove(entry))
-                return false;
-
-            _users.ReplaceOne(temp => temp.UserName == user.UserName, user);
             return true;
         }
 
