@@ -54,11 +54,11 @@ namespace RSIVueloAPI.Controllers
         [HttpPost("[action]")]
         public IActionResult GetSession([FromBody]UserDTO dto)
         {
-            var isValid = _userService.RefreshSession(dto.UserName, dto.session, dto.token);
+            var isValid = _userService.RefreshSession(dto.UserName, dto.session, dto.token, out User user);
             if (!isValid)
                 return StatusCode(StatusCodes.Status404NotFound);
 
-            return Ok();
+            return Ok(user);
         }
 
         [HttpGet("[action]")]
