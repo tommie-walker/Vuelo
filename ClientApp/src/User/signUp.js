@@ -16,7 +16,7 @@ function SignUp() {
 
   function handleSubmit() {
     const newUser = { email, username, password };
-    fetch(`${Config.userServiceUrl}CreateUser`, {
+    fetch(`${Config.authServiceUrl}CreateUser`, {
       method: "POST",
       headers: { "Content-Type": "application/json;charset=UTF-8" },
       accepts: "application/json",

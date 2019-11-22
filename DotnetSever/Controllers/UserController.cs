@@ -5,6 +5,10 @@ using RSIVueloAPI.Services;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+using System.Net.Http.Headers;
 
 namespace RSIVueloAPI.Controllers
 {
@@ -52,15 +56,43 @@ namespace RSIVueloAPI.Controllers
     }
 
     [HttpPost("[action]")]
-    public IActionResult GetSession([FromBody]UserDTO dto)
+    public async Task<ActionResult> GetSession([FromBody]UserDTO dto)
     {
-      //Request.Cookies.ContainsKey("SID");
       var cookie = Request.Cookies["SID"];
       var isValid = _userService.RefreshSession(dto.UserName, cookie, dto.token, out User user);
       if (!isValid)
         return StatusCode(StatusCodes.Status404NotFound);
 
-      return Ok(user);
+      HttpClient client = new HttpClient();
+      HttpRequestMessage heli = new HttpRequestMessage();
+      Helicopter h = new Helicopter();
+      h.heliId = dto.heliId;
+      h.heliModel = dto.heliModel;
+      h.heliUrl = dto.heliUrl;
+      h.heliType = dto.heliType;
+      h.heliCap = dto.heliCap;
+      h.heliMax = dto.heliMax;
+      h.heliMin = dto.heliMin;
+      h.heliLength = dto.heliLength;
+      h.heliHeight = dto.heliHeight;
+      h.heliRotor = dto.heliRotor;
+      h.heliMaxSpeed = dto.heliMaxSpeed;
+
+      var json = JsonConvert.SerializeObject(h);
+      var content = new StringContent(json, Encoding.UTF8, "application/json");
+      var request = new HttpRequestMessage
+      {
+        RequestUri = new Uri("http://localhost:8080/api/helicopter/"),
+        Content = content,
+        Method = HttpMethod.Post,
+        //Headers = new HttpHeaderValueCollection<MediaTypeWithQualityHeaderValue>() 
+      };
+
+
+      request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json;charset=UTF-8"));
+      HttpResponseMessage result = await client.SendAsync(request);
+
+      return Ok(result);
     }
 
     [HttpGet("[action]")]

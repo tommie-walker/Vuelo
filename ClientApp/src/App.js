@@ -16,14 +16,14 @@ import EmailPrompt from './User/emailPrompt';
 import UserProfile from './User/userProfile';
 import UserContextProvider from "./contexts/UserContext";
 import HelicopterContextProvider from "./contexts/HelicopterContext";
-import TimerContextProvider from "./contexts/TimerContext";
+import AuthContextProvider from "./contexts/AuthContext";
 
 function App() {
 
   return (
     <Router>
       <UserContextProvider>
-        <TimerContextProvider >
+        <AuthContextProvider >
           <HelicopterContextProvider >
             <Layout className="layout">
               <Route path='/users/:username' exact render={() => <UserProfile />} />
@@ -36,7 +36,7 @@ function App() {
               <Route path="/signUp" exact render={() => <SignUp />} />
             </Layout>
           </HelicopterContextProvider>
-        </TimerContextProvider>
+        </AuthContextProvider>
       </UserContextProvider>
     </Router>
   );

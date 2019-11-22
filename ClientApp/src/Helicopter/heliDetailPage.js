@@ -5,16 +5,15 @@ import config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
 import { UserContext } from "../contexts/UserContext";
 import { HelicopterContext } from '../contexts/HelicopterContext';
+import { AuthContext } from '../contexts/AuthContext';
 import { isEmpty } from 'lodash';
 
 const HeliDetailPage = () => {
   let history = useHistory();
   const urlParams = useParams();
   const heliId = urlParams._id;
-
   const { helis } = useContext(HelicopterContext);
   const { user, updateUser } = useContext(UserContext);
-
   const [heliUrl, setHeliUrl] = useState('');
   const [type, setType] = useState('');
   const [model, setModel] = useState('');
@@ -30,7 +29,6 @@ const HeliDetailPage = () => {
   const heli = helis.filter(h => heliId === h._id);
 
   useEffect(() => {
-    console.log(user);
     getHelicopter();
   }, []);
 
@@ -64,8 +62,8 @@ const HeliDetailPage = () => {
   function addFavorite() {
     if (!user.username) history.push('/login');
     if (favorite) return
-    const userFav = { model, username: user.username }
-    fetch(`${config.userServiceUrl}AddUserFavorite`, {
+    const userFav = { model, username: user.username, token: user.token }
+    fetch(`${config.authServiceUrl}AddUserFavorite`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -85,10 +83,10 @@ const HeliDetailPage = () => {
 
 
   function removeFavorite() {
-    const userFav = { model, username: user.username, SessionId:  }
+    const userFav = { model, username: user.username, token: user.token }
     const removedFavoriteArray = user.favorites.filter(m => !model === m);
     console.log(user.favorites.filter(m => model !== m))
-    fetch(`${config.userServiceUrl}DeleteUserFavorite`, {
+    fetch(`${config.authServiceUrl}DeleteUserFavorite`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -106,12 +104,14 @@ const HeliDetailPage = () => {
   };
 
   function deleteHeli() {
-    fetch(`${config.helicopterServiceUrl}${heli._id}`, {
+    const authHeli = { _id, username: user.username, token: user.token }
+    fetch(`${config.authServiceUrl}${heli._id}`, {
       method: `DELETE`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json'
-      }
+      },
+      body: JSON.stringify(authHeli)
     })
       .then(res => {
         if (!res.ok) throw Error(res.statusText);
@@ -126,13 +126,13 @@ const HeliDetailPage = () => {
   }
 
   function updateHelicopter() {
-    const heli = { _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed };
+    const authHeli = { heliId: _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed, username: user.username, token: user.token, };
     fetch(`${config.helicopterServiceUrl}${heli._id}`, {
       method: `PATCH`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      body: JSON.stringify(heli)
+      body: JSON.stringify(authHeli)
     })
       .then(res => {
         if (!res.ok) {

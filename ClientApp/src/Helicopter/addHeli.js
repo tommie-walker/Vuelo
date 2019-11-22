@@ -33,7 +33,8 @@ function AddHeli(props) {
 
   function addNewHelicopter() {
     const newHeli = { type, model, capacityWeight: capWeight, crewMax, crewMin, fuselageLength: fuseLength, height: heliHeight, rotorDiameter: rotorDiam, url, maxSpeed, username: user.username, token: user.token };
-    fetch(`${Config.authServiceUrl}GetSession`, {
+    fetch(`${Config.authServiceUrl}`, {
+
       method: `POST`,
       headers: {
         "Content-Type": "application/JSON"

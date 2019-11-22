@@ -6,10 +6,11 @@ import HelicopterList from "./helicopter-list";
 import Config from '../config/app.local.config';
 import Banner from "../NavHeader/banner";
 import { HelicopterContext } from '../contexts/HelicopterContext';
-import { TimerContext } from "../contexts/TimerContext";
+import { AuthContext } from "../contexts/AuthContext";
 
 function Helicopter() {
   const { Search } = Input;
+  const { authenticate } = useContext(AuthContext);
   const { updateHelis } = useContext(HelicopterContext);
   const [helicopters, setHelicopters] = useState([])
   const [filtHeli, setFiltHeli] = useState(helicopters);
@@ -22,12 +23,6 @@ function Helicopter() {
   const [heliHeight, setHeliHeight] = useState(1);
   const [rotorDiam, setRotorDiameter] = useState(10);
   const [maxSpeed, setMaxSpeed] = useState(1);
-
-  const { startSessionTimer } = useContext(TimerContext);
-
-  useEffect(() => {
-    startSessionTimer();
-  }, [])
 
   function loadData() {
     fetch(`${Config.helicopterServiceUrl}`)
@@ -48,6 +43,7 @@ function Helicopter() {
   }
 
   useEffect(() => {
+    authenticate();
     if (isEmpty(helicopters)) {
       loadData();
     }
