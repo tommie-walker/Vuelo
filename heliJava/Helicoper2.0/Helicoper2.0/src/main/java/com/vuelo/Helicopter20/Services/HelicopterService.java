@@ -50,6 +50,7 @@ public class HelicopterService {
         return helicopters;
     }
 
+    //update existing helicopter information
     public Helicopter updateHelicopter(String id, Helicopter heli){
         Helicopter h = helicopterRepository.findBy_id(id);
         if(h != null){

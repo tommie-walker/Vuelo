@@ -60,8 +60,13 @@ public class HelicopterController {
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Max-Age", "4800");
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        helicopterRepository.insert(heli);
-        return heli;
+        if(helicopterRepository.findByModel(heli.getModel())== heli){
+            return null;
+        }else {
+            helicopterRepository.insert(heli);
+            return heli;
+        }
+
     }
 //updating helicopter
     @PatchMapping("/api/helicopter/{_id}")
