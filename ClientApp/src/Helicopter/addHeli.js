@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Input, Button, Form, notification, message } from "antd";
 import Config from "../config/app.local.config";
 import Banner from '../NavHeader/banner';
+import { UserContext } from '../contexts/UserContext';
 
 function AddHeli(props) {
+  const { user } = useContext(UserContext);
   const [model, setModel] = useState();
   const [type, setType] = useState();
   const [capWeight, setCapWeight] = useState();
@@ -30,8 +32,8 @@ function AddHeli(props) {
   }
 
   function addNewHelicopter() {
-    const newHeli = { type, model, capacityWeight: capWeight, crewMax, crewMin, fuselageLength: fuseLength, height: heliHeight, rotorDiameter: rotorDiam, url, maxSpeed };
-    fetch(`${Config.helicopterServiceUrl}`, {
+    const newHeli = { type, model, capacityWeight: capWeight, crewMax, crewMin, fuselageLength: fuseLength, height: heliHeight, rotorDiameter: rotorDiam, url, maxSpeed, username: user.username, token: user.token };
+    fetch(`${Config.authServiceUrl}GetSession`, {
       method: `POST`,
       headers: {
         "Content-Type": "application/JSON"
