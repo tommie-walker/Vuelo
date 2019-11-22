@@ -16,7 +16,7 @@ const AuthContextProvider = props => {
   function authenticateSession() {
     if (isEmpty(jwt) || isEmpty(username)) return
     const userAuth = { jwt, username }
-    fetch(`${config.userServiceUrl}GetSession`, {
+    fetch(`${config.authServiceUrl}GetSession`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -30,14 +30,14 @@ const AuthContextProvider = props => {
         console.log('Valid Session ID');
       })
       .catch(err => {
-        message.error('invalid session');
+        message.error('Invalid Session');
         updateUser({});
         history.push('/login');
       });
   }
 
   const authenticate = () => {
-    authenticateSession();
+    setTimeout(() => authenticateSession(), 600000);
   }
 
   return (

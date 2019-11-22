@@ -14,7 +14,7 @@ function Login(props) {
 
   function authenticateUser() {
     const user = { username, password };
-    fetch(`${Config.userServiceUrl}Authenticate`, {
+    fetch(`${Config.authServiceUrl}Authenticate`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
