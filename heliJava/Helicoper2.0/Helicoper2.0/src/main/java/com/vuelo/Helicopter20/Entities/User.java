@@ -8,8 +8,8 @@ import java.util.List;
 
 @Document(collection = "User")
 @Builder
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

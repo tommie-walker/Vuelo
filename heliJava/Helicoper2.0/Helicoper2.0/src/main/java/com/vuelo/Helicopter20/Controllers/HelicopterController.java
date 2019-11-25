@@ -60,18 +60,7 @@ public class HelicopterController {
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Max-Age", "4800");
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        if(helicopterRepository.findByModel(heli.getModel()) == heli){
-          Boolean duplicate = heliService.stringCheck(heli.getModel(), helicopterRepository.findByModel(heli.getModel()).getModel());
-          if(duplicate){
-              return null;
-          } else{
-              helicopterRepository.insert(heli);
-              return heli;
-          }
-        }else {
-            helicopterRepository.insert(heli);
-            return heli;
-        }
+        return heliService.duplicateCheck(heli);
     }
 //updating helicopter
     @PatchMapping("/api/helicopter/{_id}/{username}")
@@ -81,7 +70,7 @@ public class HelicopterController {
 //finds a specific helicopter model
     @RequestMapping("/Helicopter/{model}")
         public  String getHelicopterByModel(@PathVariable String model){
-            Helicopter h = helicopterRepository.findByModel(model);
+            Helicopter h = helicopterRepository.findByModelIgnoreCase(model);
             return h.toString();
     }
 //Returns users favorite helicopter

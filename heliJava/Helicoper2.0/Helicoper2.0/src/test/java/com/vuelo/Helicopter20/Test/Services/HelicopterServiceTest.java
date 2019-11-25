@@ -1,23 +1,23 @@
 //package com.vuelo.Helicopter20.Test.Services;
 //
-//import com.vuelo.Helicopter20.Entities.Helicopter;
-//import com.vuelo.Helicopter20.Entities.User;
-//import com.vuelo.Helicopter20.Repositories.HelicopterRepository;
-//import com.vuelo.Helicopter20.Repositories.SessionRepository;
-//import com.vuelo.Helicopter20.Repositories.UserRepository;
-//import com.vuelo.Helicopter20.Services.HelicopterService;
-//import org.junit.Before;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.Mockito;
-//import org.mockito.MockitoAnnotations;
+//        import com.vuelo.Helicopter20.Entities.Helicopter;
+//        import com.vuelo.Helicopter20.Entities.User;
+//        import com.vuelo.Helicopter20.Repositories.HelicopterRepository;
+//        import com.vuelo.Helicopter20.Repositories.UserRepository;
+//        import com.vuelo.Helicopter20.Services.HelicopterService;
+//        import org.junit.Before;
+//        import org.junit.jupiter.api.Test;
+//        import org.mockito.Mockito;
+//        import org.mockito.MockitoAnnotations;
 //
-//import java.util.ArrayList;
-//import java.util.List;
+//        import java.util.ArrayList;
+//        import java.util.List;
 //
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.Mockito.when;
+//        import static org.junit.jupiter.api.Assertions.assertEquals;
+//        import static org.mockito.ArgumentMatchers.any;
+//        import static org.mockito.ArgumentMatchers.anyString;
+//        import static org.mockito.Mockito.doNothing;
+//        import static org.mockito.Mockito.when;
 //
 //public class HelicopterServiceTest {
 //
@@ -25,10 +25,7 @@
 //
 //    private UserRepository userRepository = Mockito.mock(UserRepository.class);
 //
-//    private SessionRepository sessionRepository = Mockito.mock(SessionRepository.class);
-//
-//    HelicopterService helicopterService = new HelicopterService(userRepository, helicopterRepository, sessionRepository);
-//
+//    HelicopterService helicopterService = new HelicopterService(userRepository, helicopterRepository);
 //    @Before
 //    public void init(){
 //        MockitoAnnotations.initMocks(this);
@@ -127,15 +124,63 @@
 //                .rotorDiameter("rotorDiameter").type("tester2").url("url").build();
 //
 //        when(userRepository.findByUsername(any())).thenReturn(user);
-//        when(helicopterRepository.findByModel("UH-60A")).thenReturn(heli);
-//        when(helicopterRepository.findByModel("HC.2")).thenReturn(heli2);
+//        when(helicopterRepository.findByModelIgnoreCase("UH-60A")).thenReturn(heli);
+//        when(helicopterRepository.findByModelIgnoreCase("HC.2")).thenReturn(heli2);
 //
 //        List<Helicopter> heliList = new ArrayList<>();
 //        heliList.add(heli2);
 //        heliList.add(heli);
 //
-//       assertEquals(heliList,helicopterService.getFavoritesByUserUsername(user.getUsername()));
+//        assertEquals(heliList,helicopterService.getFavoritesByUserUsername(user.getUsername()));
 //
 //    }
 //
+//    @Test
+//    public void duplicateCheckExistsTest(){
+//        //create test heli
+//        Helicopter dataHeli = Helicopter.builder()
+//                .model("data")
+//                .type("data")
+//                .height("data")
+//                .crewMax("data")
+//                .capacityWeight("data")
+//                .crewMin("data")
+//                .fuselageLength("data")
+//                .maxSpeed("data")
+//                .rotorDiameter("data")
+//                .build();
+//
+//        Helicopter testHeli = Helicopter.builder()
+//                .model("data")
+//                .type("test")
+//                .height("test")
+//                .crewMax("test")
+//                .capacityWeight("test")
+//                .crewMin("test")
+//                .fuselageLength("test")
+//                .maxSpeed("test")
+//                .rotorDiameter("test")
+//                .build();
+//
+//        when(helicopterRepository.findByModelIgnoreCase(testHeli.getModel())).thenReturn(dataHeli);
+//        assertEquals(dataHeli, helicopterService.duplicateCheck(testHeli));
+//    }
+//    @Test
+//    public void duplicateDoesntExistTest(){
+//        Helicopter testHeli = Helicopter.builder()
+//                .model("test")
+//                .type("test")
+//                .height("test")
+//                .crewMax("test")
+//                .capacityWeight("test")
+//                .crewMin("test")
+//                .fuselageLength("test")
+//                .maxSpeed("test")
+//                .rotorDiameter("test")
+//                .build();
+//
+//        when(helicopterRepository.findByModelIgnoreCase(testHeli.getModel())).thenReturn(null);
+//        assertEquals(testHeli, helicopterService.duplicateCheck(testHeli));
+//
+//    }
 //}

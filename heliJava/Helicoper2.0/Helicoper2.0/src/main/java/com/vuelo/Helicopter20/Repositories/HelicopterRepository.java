@@ -10,6 +10,7 @@ import java.util.List;
 public interface HelicopterRepository extends MongoRepository<Helicopter, String> {
     Helicopter findBy_id(String id);
     Helicopter findByModel(String model);
+    Helicopter findByModelIgnoreCase(String model);
     List<Helicopter> findAll();
    Helicopter insert(Helicopter helicopter);
    void delete(Helicopter helicopter);
