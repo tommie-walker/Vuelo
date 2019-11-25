@@ -37,8 +37,20 @@ public class HelicopterService {
         Session session = sessionRepository.findByUserEmail(email);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.SECOND,30);
-        session.setExpire((DateTimeFormat) calendar.getTime());
+        session.setExpire(calendar.getTime());
     }
+
+    public boolean stringCheck(String existing, String newInput){
+        existing = existing.trim();
+        existing = existing.toLowerCase();
+        newInput = newInput.trim();
+        newInput = newInput.toLowerCase();
+        if(existing == newInput){
+            return  true;
+        }else{
+            return false;
+        }
+    };
 
     //find user then create list of their favorite helicopter
     public List<Helicopter> getFavoritesByUserUsername(String username){

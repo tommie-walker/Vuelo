@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class User {
-        public String email;
+        String email;
         String _id;
         @Field
         List<String> favorites;

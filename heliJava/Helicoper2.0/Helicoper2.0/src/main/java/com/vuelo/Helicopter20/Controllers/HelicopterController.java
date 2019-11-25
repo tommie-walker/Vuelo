@@ -60,16 +60,21 @@ public class HelicopterController {
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Max-Age", "4800");
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        if(helicopterRepository.findByModel(heli.getModel())== heli){
-            return null;
+        if(helicopterRepository.findByModel(heli.getModel()) == heli){
+          Boolean duplicate = heliService.stringCheck(heli.getModel(), helicopterRepository.findByModel(heli.getModel()).getModel());
+          if(duplicate){
+              return null;
+          } else{
+              helicopterRepository.insert(heli);
+              return heli;
+          }
         }else {
             helicopterRepository.insert(heli);
             return heli;
         }
-
     }
 //updating helicopter
-    @PatchMapping("/api/helicopter/{_id}")
+    @PatchMapping("/api/helicopter/{_id}/{username}")
     Helicopter updateHelicopter(@PathVariable String _id, @RequestBody Helicopter heli){
         return heliService.updateHelicopter(_id, heli);
     }
