@@ -1,5 +1,6 @@
 //package com.vuelo.Helicopter20.Test.Services;
 //
+
 //        import com.vuelo.Helicopter20.Entities.Helicopter;
 //        import com.vuelo.Helicopter20.Entities.User;
 //        import com.vuelo.Helicopter20.Repositories.HelicopterRepository;
@@ -18,15 +19,18 @@
 //        import static org.mockito.ArgumentMatchers.anyString;
 //        import static org.mockito.Mockito.doNothing;
 //        import static org.mockito.Mockito.when;
+
 //
 //public class HelicopterServiceTest {
 //
 //    private HelicopterRepository helicopterRepository = Mockito.mock(HelicopterRepository.class);
 //
 //    private UserRepository userRepository = Mockito.mock(UserRepository.class);
-//
+
 //    HelicopterService helicopterService = new HelicopterService(userRepository, helicopterRepository);
 //    @Before
+
+
 //    public void init(){
 //        MockitoAnnotations.initMocks(this);
 //    }
@@ -124,13 +128,16 @@
 //                .rotorDiameter("rotorDiameter").type("tester2").url("url").build();
 //
 //        when(userRepository.findByUsername(any())).thenReturn(user);
+
 //        when(helicopterRepository.findByModelIgnoreCase("UH-60A")).thenReturn(heli);
 //        when(helicopterRepository.findByModelIgnoreCase("HC.2")).thenReturn(heli2);
+
 //
 //        List<Helicopter> heliList = new ArrayList<>();
 //        heliList.add(heli2);
 //        heliList.add(heli);
 //
+
 //        assertEquals(heliList,helicopterService.getFavoritesByUserUsername(user.getUsername()));
 //
 //    }
@@ -183,4 +190,5 @@
 //        assertEquals(testHeli, helicopterService.duplicateCheck(testHeli));
 //
 //    }
+
 //}
