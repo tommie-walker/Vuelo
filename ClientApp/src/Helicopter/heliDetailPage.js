@@ -105,7 +105,7 @@ const HeliDetailPage = () => {
 
   function deleteHeli() {
     const authHeli = { _id, username: user.username, token: user.token }
-    fetch(`${config.authServiceUrl}${heli._id}`, {
+    fetch(`${config.authServiceUrl}DeleteHeli`, {
       method: `DELETE`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -127,7 +127,7 @@ const HeliDetailPage = () => {
 
   function updateHelicopter() {
     const authHeli = { heliId: _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed, username: user.username, token: user.token, };
-    fetch(`${config.helicopterServiceUrl}${heli._id}`, {
+    fetch(`${config.helicopterServiceUrl}UpdateHeli`, {
       method: `PATCH`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
