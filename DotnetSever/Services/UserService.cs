@@ -48,7 +48,7 @@ namespace RSIVueloAPI.Services
                 RefreshExpiration = settings.RefreshExpiration
             };
 
-            sidExpire = 30;
+            sidExpire = 300;
         }
         public bool CheckLoginToken(string email, out string exist)
         {
@@ -66,7 +66,7 @@ namespace RSIVueloAPI.Services
 
         public string GenerateJWT(UserDTO user)
         {
-            var expiry = 60;
+            var expiry = 180;
             var claim = new[]
             {
                 new Claim(ClaimTypes.Name, user.UserName),
