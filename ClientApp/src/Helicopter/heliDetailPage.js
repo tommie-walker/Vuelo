@@ -104,7 +104,7 @@ const HeliDetailPage = () => {
   };
 
   function deleteHeli() {
-    const authHeli = { _id, username: user.username, token: user.token }
+    const authHeli = { heliId: _id, username: user.username, token: user.token }
     fetch(`${config.authServiceUrl}DeleteHeli`, {
       method: `DELETE`,
       headers: {
