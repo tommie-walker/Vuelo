@@ -28,7 +28,7 @@ namespace RSIVueloAPI.Controllers
         {
             var user = _userService.LoginUser(dto.UserName, dto.Password);
             if (user == null)
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status401Unauthorized);
 
             var checkJWT = _userService.CheckLoginToken(user.Email, out string jwt);
             _userService.CreateDTO(user, out UserDTO newDTO);
@@ -41,7 +41,7 @@ namespace RSIVueloAPI.Controllers
 
             var isSaved = _userService.SaveSession(newDTO, random, jwt);
             if (!isSaved)
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status401Unauthorized);
 
             return Ok(new
             {
@@ -56,12 +56,23 @@ namespace RSIVueloAPI.Controllers
         }
 
         [HttpPost("[action]")]
+        public IActionResult GetSession([FromBody]UserDTO dto)
+        {
+            var cookie = Request.Cookies["SID"];
+            var isValid = _userService.RefreshSession(dto.UserName, cookie, dto.token, out User user);
+            if (!isValid)
+                return StatusCode(StatusCodes.Status401Unauthorized);
+
+            return Ok(user);
+        }
+
+        [HttpPost("[action]")]
         public async Task<ActionResult> AddHeli([FromBody]UserDTO dto)
         {
             var cookie = Request.Cookies["SID"];
             var isValid = _userService.RefreshSession(dto.UserName, cookie, dto.token, out User user);
             if (!isValid)
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status401Unauthorized);
 
             HttpClient client = new HttpClient();
             HttpRequestMessage heli = new HttpRequestMessage();
@@ -101,7 +112,7 @@ namespace RSIVueloAPI.Controllers
             var cookie = Request.Cookies["SID"];
             var isValid = _userService.RefreshSession(dto.UserName, cookie, dto.token, out User user);
             if (!isValid)
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status401Unauthorized);
 
             HttpClient client = new HttpClient();
             HttpRequestMessage heli = new HttpRequestMessage();
@@ -131,7 +142,7 @@ namespace RSIVueloAPI.Controllers
             var cookie = Request.Cookies["SID"];
             var isValid = _userService.RefreshSession(dto.UserName, cookie, dto.token, out User user);
             if (!isValid)
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status401Unauthorized);
 
             HttpClient client = new HttpClient();
             HttpRequestMessage heli = new HttpRequestMessage();
