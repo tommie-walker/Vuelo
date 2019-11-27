@@ -1,11 +1,30 @@
 import React, { useState, useContext } from 'react';
-import { Icon, Drawer, Col, Row } from 'antd';
+import { Icon, Drawer, Col, Row, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
+import Config from '../config/app.local.config';
+
 
 const NavHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, updateUser } = useContext(UserContext);
+
+  function userLogout() {
+    const userAuth = { username: user.username }
+    fetch(`${Config.authServiceUrl}Logout`, {
+      method: `POST`,
+      headers: {
+        "Content-Type": "application/JSON"
+      },
+      body: JSON.stringify(userAuth)
+    })
+      .then(res => {
+        if (!res.ok) { throw Error(res.statusText); }
+      })
+      .catch(err => {
+        message.error('Something went wrong');
+      });
+  }
 
   function toggleMenu() {
     if (menuOpen) {
@@ -26,7 +45,7 @@ const NavHeader = () => {
           height='fit-content'
         >
           <Row>
-            <Col span={user.token ? user.role === 'admin' ? 5 : 6 : 8} offset={1}>
+            <Col span={user.token ? user.role === 'admin' ? 5 : 5 : 8} offset={1}>
               <Link to="/">
                 <h1 className='drawerContentTitle navHeaderFont'><Icon type="home" />Home</h1>
               </Link>
@@ -40,7 +59,7 @@ const NavHeader = () => {
               : ''}
             {user.token ?
               <>
-                <Col span={user.role === 'admin' ? 4 : 3} offset={user.role === 'admin' ? 0 : 9}>
+                <Col span={user.role === 'admin' ? 5 : 5} offset={user.role === 'admin' ? 0 : 5}>
                   <Link to={{
                     pathname: `/users/${user.username}`,
                     state: { user }
@@ -53,8 +72,9 @@ const NavHeader = () => {
             }
             {user.token ?
               <>
-                <Col span={user.role === 'admin' ? 5 : 3}>
+                <Col span={user.role === 'admin' ? 5 : 5}>
                   <Link to='/' onClick={() => {
+                    userLogout();
                     updateUser({});
                   }}>
                     <h1 className='drawerContentTitle navHeaderFont loginNav logout'><Icon type="profile" />Logout</h1>

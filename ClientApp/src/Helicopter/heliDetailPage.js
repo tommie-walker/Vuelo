@@ -127,8 +127,8 @@ const HeliDetailPage = () => {
 
   function updateHelicopter() {
     const authHeli = { heliId: _id, type, model, capacityWeight, crewMax, crewMin, fuselageLength, height: heliHeight, rotorDiameter: rotorDiam, maxSpeed, username: user.username, token: user.token, };
-    fetch(`${config.helicopterServiceUrl}UpdateHeli`, {
-      method: `PATCH`,
+    fetch(`${config.authServiceUrl}UpdateHeli`, {
+      method: `POST`,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
