@@ -11,11 +11,11 @@ const AuthContextProvider = props => {
   let history = useHistory();
   const { user, updateUser } = useContext(UserContext);
   const username = user.username;
-  const jwt = user.token;
+  const token = user.token;
 
   function authenticateSession() {
-    if (isEmpty(jwt) || isEmpty(username)) return
-    const userAuth = { jwt, username }
+    if (isEmpty(token) || isEmpty(username)) return
+    const userAuth = { token, username }
     fetch(`${config.authServiceUrl}GetSession`, {
       method: "POST",
       headers: {
@@ -37,7 +37,7 @@ const AuthContextProvider = props => {
   }
 
   const authenticate = () => {
-    setTimeout(() => authenticateSession(), 600000);
+    setTimeout(() => authenticateSession(), 5000);
   }
 
   return (
