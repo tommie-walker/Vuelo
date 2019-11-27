@@ -8,13 +8,13 @@ import java.util.List;
 
 @Document(collection = "User")
 @Builder
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class User {
-        public String email;
+        String email;
         String _id;
         @Field
         List<String> favorites;

@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import java.util.Objects;
 
 @Document(collection = "Helicopters")
-@Getter
 @Setter
+@Getter
 @ToString
 @AllArgsConstructor
 @Builder
@@ -28,5 +28,27 @@ public class Helicopter {
     String rotorDiameter;
     String maxSpeed;
     String url;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Helicopter that = (Helicopter) o;
+        return Objects.equals(type, that.type) &&
+                model.equals(that.model) &&
+                Objects.equals(capacityWeight, that.capacityWeight) &&
+                Objects.equals(crewMax, that.crewMax) &&
+                Objects.equals(crewMin, that.crewMin) &&
+                Objects.equals(fuselageLength, that.fuselageLength) &&
+                Objects.equals(height, that.height) &&
+                Objects.equals(rotorDiameter, that.rotorDiameter) &&
+                Objects.equals(maxSpeed, that.maxSpeed);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, model, capacityWeight, crewMax, crewMin, fuselageLength, height, rotorDiameter, maxSpeed);
+    }
+
 
 }
